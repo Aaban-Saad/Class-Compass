@@ -75,3 +75,10 @@ h1 {
     width: 100%;
     background-color: rgba(0, 0, 0, 0);
 }
+
+@media screen and (max-width: 1050px) {
+    .login-container {
+        height: 200px;
+    width: 350px;
+    }
+}

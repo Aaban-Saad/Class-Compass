@@ -4,6 +4,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    text-align: center  ;
 }
 
 body{
@@ -27,6 +28,7 @@ h2{
     /* font-size: large; */
     color: rgba(255, 255, 255, 0.601);
 }
+
 
 /* Main page start*/
 .main-container{
@@ -58,3 +60,10 @@ h2{
 
 }
 /* Main page end */
+
+
+@media screen and (max-width: 1050px) {
+    h1 {
+        font-size: 50px;
+    }
+}
