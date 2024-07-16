@@ -72,12 +72,32 @@
                             <span class="bar-2"></span>
                             <label>hh:mm</label>
                         </div>
+                        <div class="flip-box">
+                            <div class="flip-box-inner">
+                                <div class="flip-box-front-2">
+                                    AM
+                                </div>
+                                <div class="flip-box-back-2">
+                                    PM
+                                </div>
+                            </div>
+                        </div>
                         <span>To:</span>
                         <div class="group-2">
                             <input class="input-2" type="text" required>
                             <span class="highlight"></span>
                             <span class="bar-2"></span>
                             <label>hh:mm</label>
+                        </div>
+                        <div class="flip-box">
+                            <div class="flip-box-inner">
+                                <div class="flip-box-front-2">
+                                    AM
+                                </div>
+                                <div class="flip-box-back-2">
+                                    PM
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -95,14 +115,14 @@
                     <button class="custom-btn btn-2">Add</button>
                     <div class="added-gaps-container">
                         <div class="gap">
-                            <p>11:00 - 13:30 <br> (ST)</p>
+                            <p>11:00 AM - 01:30 PM<br> (ST)</p>
                             <button class="custom-btn btn-5">
                                 X
                             </button>
                         </div>
 
                         <div class="gap">
-                            <p>11:00 - 13:30 <br> (All days)</p>
+                            <p>11:00 AM - 01:30 PM<br> (All days)</p>
                             <button class="custom-btn btn-5">
                                 X
                             </button>
@@ -110,10 +130,10 @@
                     </div>
 
                     <div class="hr"></div>
-                    
+
                     <h2>Advanced Settings</h2>
 
-                    
+
                     <div class="advanced-setting-container">
                         <div class="advanced-setting">
                             Possible class Days:
@@ -130,7 +150,7 @@
                                     </div>
                                 </div>
                             </div>
-    
+
                             <div class="day-container">
                                 <span class="day">MW</span>
                                 <div class="flip-box">
@@ -144,7 +164,7 @@
                                     </div>
                                 </div>
                             </div>
-    
+
                             <div class="day-container">
                                 <span class="day">RA</span>
                                 <div class="flip-box">
@@ -158,7 +178,7 @@
                                     </div>
                                 </div>
                             </div>
-    
+
                             <div class="day-container">
                                 <span class="day">F</span>
                                 <div class="flip-box">
@@ -173,65 +193,38 @@
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="advanced-setting">
-                            Try to minimize class days: 
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
-                                    </div>
-                                </div>
+                            Preferred class days per week:
+                            <div class="plus-minus-button">
+                                <button class="custom-btn btn-15">-</button>
+                                <span>4</span>
+                                <button class="custom-btn btn-15">+</button>
+                            </div>
+                        </div>
+
+
+
+                        <div class="advanced-setting">
+                            Maximum number of classes per day:
+                            <div class="plus-minus-button">
+                                <button class="custom-btn btn-15">-</button>
+                                <span>7</span>
+                                <button class="custom-btn btn-15">+</button>
                             </div>
                         </div>
 
                         <div class="advanced-setting">
-                            Try to avoid long gaps: 
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
-                                    </div>
-                                </div>
+                            Maximum number of back to back classes:
+                            <div class="plus-minus-button">
+                                <button class="custom-btn btn-15">-</button>
+                                <span>7</span>
+                                <button class="custom-btn btn-15">+</button>
                             </div>
                         </div>
 
                         <div class="advanced-setting">
-                            Try to keep long gaps: 
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Avoid prayer times: 
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Maximum number of finals per day: 
+                            Maximum number of finals per day:
                             <div class="plus-minus-button">
                                 <button class="custom-btn btn-15">-</button>
                                 <span>5</span>
@@ -240,26 +233,156 @@
                         </div>
 
                         <div class="advanced-setting">
-                            Maximum number of back to back classes: 
-                            <div class="plus-minus-button">
-                                <button class="custom-btn btn-15">-</button>
-                                <span>7</span>
-                                <button class="custom-btn btn-15">+</button>
+                            Try to avoid long gaps:
+                            <div class="flip-box">
+                                <div class="flip-box-inner">
+                                    <div class="flip-box-front">
+                                        Yes
+                                    </div>
+                                    <div class="flip-box-back">
+                                        No
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="advanced-setting">
+                            Try to keep long gaps:
+                            <div class="flip-box">
+                                <div class="flip-box-inner">
+                                    <div class="flip-box-front">
+                                        Yes
+                                    </div>
+                                    <div class="flip-box-back">
+                                        No
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="advanced-setting">
+                            Avoid prayer times:
+                            <div class="flip-box">
+                                <div class="flip-box-inner">
+                                    <div class="flip-box-front">
+                                        Yes
+                                    </div>
+                                    <div class="flip-box-back">
+                                        No
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="hr"></div>
-                    
-                    <h2>Notification Settings</h2>
 
-                    <div class="hr"></div>
-                    
                     <button class="custom-btn btn-11">Search</button>
             </div>
 
             <div class="combinations-page">
-                
+                <h2>Results</h2>
+                <div class="combination-container">
+                    <div class="combination-header-container">
+                        <h3>Combination 1</h3>
+                        <button class="custom-btn btn-2">Save</button>
+                    </div>
+                    <table class="rwd-table">
+                        <tr>
+                            <th>Course</th>
+                            <th>Time</th>
+                            <th>Sections</th>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115L</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="combination-container">
+                    <div class="combination-header-container">
+                        <h3>Combination 2</h3>
+                        <button class="custom-btn btn-2">Save</button>
+                    </div>
+                    <table class="rwd-table">
+                        <tr>
+                            <th>Course</th>
+                            <th>Time</th>
+                            <th>Sections</th>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115L</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="combination-container">
+                    <div class="combination-header-container">
+                        <h3>Combination 2</h3>
+                        <button class="custom-btn btn-2">Save</button>
+                    </div>
+                    <table class="rwd-table">
+                        <tr>
+                            <th>Course</th>
+                            <th>Time</th>
+                            <th>Sections</th>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115L</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                        <tr>
+                            <td data-th="Course">CSE115</td>
+                            <td data-th="Time">RA 08:00 AM - 9:15 AM</td>
+                            <td data-th="Sections">1, 2, 12, 8, 9, 20, 1, 2, 12, 8, 9, 20</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
