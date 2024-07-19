@@ -12,133 +12,197 @@
     <div class="main-container">
         <div class="pages-container">
             <div class="settings-page">
-                <h2>Add Courses</h1>
-                    <div class="course-input-container">
-                        <div class="group">
-                            <input class="input" type="text" required>
-                            <span class="highlight"></span>
-                            <span class="bar"></span>
-                            <label>Courses</label>
+                <h2 id="section-1" onclick=collapseSections(event)>Add Courses</h1>
+                    <div id="section-1-container" style = "display: flex">
+                        <div class="course-input-container">
+                            <div class="group">
+                                <input id="course-input-box" class="input" type="text" required>
+                                <span class="highlight"></span>
+                                <span class="bar"></span>
+                                <label>Course name</label>
+                            </div>
+                            <button id="course-add-btn" class="custom-btn btn-2">Add</button>
                         </div>
+                        <div id="added-courses-container" class="added-courses-container">
+                            <!-- courses will be added here -->
+                        </div>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <h2 id="section-2" onclick=collapseSections(event)>Add Gaps</h2>
+                    <div id="section-2-container" style = "display: none">
+                        <div class="break-input-container">
+                            <span>From:</span>
+                            <div class="group-2">
+                                <input class="input-2" type="text" required>
+                                <span class="highlight"></span>
+                                <span class="bar-2"></span>
+                                <label>hh:mm</label>
+                            </div>
+                            <div class="flip-box">
+                                <div class="flip-box-inner">
+                                    <div class="flip-box-front-2">
+                                        AM
+                                    </div>
+                                    <div class="flip-box-back-2">
+                                        PM
+                                    </div>
+                                </div>
+                            </div>
+                            <span>To:</span>
+                            <div class="group-2">
+                                <input class="input-2" type="text" required>
+                                <span class="highlight"></span>
+                                <span class="bar-2"></span>
+                                <label>hh:mm</label>
+                            </div>
+                            <div class="flip-box">
+                                <div class="flip-box-inner">
+                                    <div class="flip-box-front-2">
+                                        AM
+                                    </div>
+                                    <div class="flip-box-back-2">
+                                        PM
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dropdown">
+                            <button class="dropbtn">All days ></button>
+                            <div class="dropdown-content">
+                                <a href="#">All days</a>
+                                <a href="#">ST</a>
+                                <a href="#">MW</a>
+                                <a href="#">RA</a>
+                                <a href="#">F</a>
+                            </div>
+                        </div>
+
                         <button class="custom-btn btn-2">Add</button>
-                    </div>
-                    <div class="added-courses-container">
-                        <div class="course">
-                            CSE115
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
-                        </div>
-
-                        <div class="course">
-                            CSE115L
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
-                        </div>
-
-                        <div class="course">
-                            MAT116
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
-                        </div>
-
-                        <div class="course">
-                            CSE115
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
-                        </div>
-
-                        <div class="course">
-                            CSE115
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <div class="hr"></div>
-
-                    <h2>Add Gaps</h2>
-
-                    <div class="break-input-container">
-                        <span>From:</span>
-                        <div class="group-2">
-                            <input class="input-2" type="text" required>
-                            <span class="highlight"></span>
-                            <span class="bar-2"></span>
-                            <label>hh:mm</label>
-                        </div>
-                        <div class="flip-box">
-                            <div class="flip-box-inner">
-                                <div class="flip-box-front-2">
-                                    AM
-                                </div>
-                                <div class="flip-box-back-2">
-                                    PM
-                                </div>
+                        <div class="added-gaps-container">
+                            <div class="gap">
+                                <p>11:00 AM - 01:30 PM<br> (ST)</p>
+                                <button class="custom-btn btn-5">
+                                    X
+                                </button>
                             </div>
-                        </div>
-                        <span>To:</span>
-                        <div class="group-2">
-                            <input class="input-2" type="text" required>
-                            <span class="highlight"></span>
-                            <span class="bar-2"></span>
-                            <label>hh:mm</label>
-                        </div>
-                        <div class="flip-box">
-                            <div class="flip-box-inner">
-                                <div class="flip-box-front-2">
-                                    AM
-                                </div>
-                                <div class="flip-box-back-2">
-                                    PM
-                                </div>
+
+                            <div class="gap">
+                                <p>11:00 AM - 01:30 PM<br> (All days)</p>
+                                <button class="custom-btn btn-5">
+                                    X
+                                </button>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <button class="dropbtn">All days ></button>
-                        <div class="dropdown-content">
-                            <a href="#">All days</a>
-                            <a href="#">ST</a>
-                            <a href="#">MW</a>
-                            <a href="#">RA</a>
-                            <a href="#">F</a>
-                        </div>
-                    </div>
-
-                    <button class="custom-btn btn-2">Add</button>
-                    <div class="added-gaps-container">
-                        <div class="gap">
-                            <p>11:00 AM - 01:30 PM<br> (ST)</p>
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
-                        </div>
-
-                        <div class="gap">
-                            <p>11:00 AM - 01:30 PM<br> (All days)</p>
-                            <button class="custom-btn btn-5">
-                                X
-                            </button>
                         </div>
                     </div>
 
                     <div class="hr"></div>
 
-                    <h2>Advanced Settings</h2>
+                    <h2 id="section-3" onclick=collapseSections(event)>Advanced Settings</h2>
+
+                    <div id="section-3-container" style = "display: none">
+                        <div class="advanced-setting-container">
+                            <div class="advanced-setting">
+                                Possible class Days:
+                                <div class="day-container">
+                                    <span class="day">ST</span>
+                                    <div class="flip-box">
+                                        <div class="flip-box-inner">
+                                            <div class="flip-box-front">
+                                                Yes
+                                            </div>
+                                            <div class="flip-box-back">
+                                                No
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="day-container">
+                                    <span class="day">MW</span>
+                                    <div class="flip-box">
+                                        <div class="flip-box-inner">
+                                            <div class="flip-box-front">
+                                                Yes
+                                            </div>
+                                            <div class="flip-box-back">
+                                                No
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="day-container">
+                                    <span class="day">RA</span>
+                                    <div class="flip-box">
+                                        <div class="flip-box-inner">
+                                            <div class="flip-box-front">
+                                                Yes
+                                            </div>
+                                            <div class="flip-box-back">
+                                                No
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="day-container">
+                                    <span class="day">F</span>
+                                    <div class="flip-box">
+                                        <div class="flip-box-inner">
+                                            <div class="flip-box-front">
+                                                Yes
+                                            </div>
+                                            <div class="flip-box-back">
+                                                No
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="advanced-setting">
+                                Preferred class days per week:
+                                <div class="plus-minus-button">
+                                    <button class="custom-btn btn-15">-</button>
+                                    <span>4</span>
+                                    <button class="custom-btn btn-15">+</button>
+                                </div>
+                            </div>
 
 
-                    <div class="advanced-setting-container">
-                        <div class="advanced-setting">
-                            Possible class Days:
-                            <div class="day-container">
-                                <span class="day">ST</span>
+
+                            <div class="advanced-setting">
+                                Maximum number of classes per day:
+                                <div class="plus-minus-button">
+                                    <button class="custom-btn btn-15">-</button>
+                                    <span>7</span>
+                                    <button class="custom-btn btn-15">+</button>
+                                </div>
+                            </div>
+
+                            <div class="advanced-setting">
+                                Maximum number of back to back classes:
+                                <div class="plus-minus-button">
+                                    <button class="custom-btn btn-15">-</button>
+                                    <span>7</span>
+                                    <button class="custom-btn btn-15">+</button>
+                                </div>
+                            </div>
+
+                            <div class="advanced-setting">
+                                Maximum number of finals per day:
+                                <div class="plus-minus-button">
+                                    <button class="custom-btn btn-15">-</button>
+                                    <span>5</span>
+                                    <button class="custom-btn btn-15">+</button>
+                                </div>
+                            </div>
+
+                            <div class="advanced-setting">
+                                Try to avoid long gaps:
                                 <div class="flip-box">
                                     <div class="flip-box-inner">
                                         <div class="flip-box-front">
@@ -151,8 +215,8 @@
                                 </div>
                             </div>
 
-                            <div class="day-container">
-                                <span class="day">MW</span>
+                            <div class="advanced-setting">
+                                Try to keep long gaps:
                                 <div class="flip-box">
                                     <div class="flip-box-inner">
                                         <div class="flip-box-front">
@@ -165,8 +229,8 @@
                                 </div>
                             </div>
 
-                            <div class="day-container">
-                                <span class="day">RA</span>
+                            <div class="advanced-setting">
+                                Avoid prayer times:
                                 <div class="flip-box">
                                     <div class="flip-box-inner">
                                         <div class="flip-box-front">
@@ -175,100 +239,6 @@
                                         <div class="flip-box-back">
                                             No
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="day-container">
-                                <span class="day">F</span>
-                                <div class="flip-box">
-                                    <div class="flip-box-inner">
-                                        <div class="flip-box-front">
-                                            Yes
-                                        </div>
-                                        <div class="flip-box-back">
-                                            No
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Preferred class days per week:
-                            <div class="plus-minus-button">
-                                <button class="custom-btn btn-15">-</button>
-                                <span>4</span>
-                                <button class="custom-btn btn-15">+</button>
-                            </div>
-                        </div>
-
-
-
-                        <div class="advanced-setting">
-                            Maximum number of classes per day:
-                            <div class="plus-minus-button">
-                                <button class="custom-btn btn-15">-</button>
-                                <span>7</span>
-                                <button class="custom-btn btn-15">+</button>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Maximum number of back to back classes:
-                            <div class="plus-minus-button">
-                                <button class="custom-btn btn-15">-</button>
-                                <span>7</span>
-                                <button class="custom-btn btn-15">+</button>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Maximum number of finals per day:
-                            <div class="plus-minus-button">
-                                <button class="custom-btn btn-15">-</button>
-                                <span>5</span>
-                                <button class="custom-btn btn-15">+</button>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Try to avoid long gaps:
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Try to keep long gaps:
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="advanced-setting">
-                            Avoid prayer times:
-                            <div class="flip-box">
-                                <div class="flip-box-inner">
-                                    <div class="flip-box-front">
-                                        Yes
-                                    </div>
-                                    <div class="flip-box-back">
-                                        No
                                     </div>
                                 </div>
                             </div>
@@ -386,6 +356,8 @@
             </div>
         </div>
     </div>
+
+    <script src="js/app.js"></script>
 </body>
 
 </html>
