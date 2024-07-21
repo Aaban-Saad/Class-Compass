@@ -7,6 +7,21 @@ let am_to = "AM";
 let day = "All days";
 let addedGaps = [];
 
+// Section 3 globals
+let st = true;
+let mw = true;
+let ra = true;
+let f = true;
+
+let preferredClassDays = 4;
+let maxClasses = 7;
+let maxBackToBackClasses = 7;
+let maxFinal = 5;
+
+let avoidLongGaps = false;
+let keepLongGaps = false;
+let avoidPrayerTimes = true;
+
 
 // Section 1 functions
 
@@ -61,23 +76,23 @@ function removeCourse(event) {
 function amFrom() {
     if (am_from === "AM") {
         am_from = "PM";
-        document.getElementById("am-from").setAttribute("style", "display: none");
-        document.getElementById("pm-from").setAttribute("style", "display: flex");
+        document.getElementById("am-from").setAttribute("style", "display: none;");
+        document.getElementById("pm-from").setAttribute("style", "display: flex;");
     } else {
         am_from = "AM";
-        document.getElementById("am-from").setAttribute("style", "display: flex");
-        document.getElementById("pm-from").setAttribute("style", "display: none");
+        document.getElementById("am-from").setAttribute("style", "display: flex;");
+        document.getElementById("pm-from").setAttribute("style", "display: none;");
     }
 }
 function amTo() {
     if (am_to === "AM") {
         am_to = "PM";
-        document.getElementById("am-to").setAttribute("style", "display: none");
-        document.getElementById("pm-to").setAttribute("style", "display: flex");
+        document.getElementById("am-to").setAttribute("style", "display: none;");
+        document.getElementById("pm-to").setAttribute("style", "display: flex;");
     } else {
         am_to = "AM";
-        document.getElementById("am-to").setAttribute("style", "display: flex");
-        document.getElementById("pm-to").setAttribute("style", "display: none");
+        document.getElementById("am-to").setAttribute("style", "display: flex;");
+        document.getElementById("pm-to").setAttribute("style", "display: none;");
     }
 }
 
@@ -85,17 +100,17 @@ function amTo() {
 // Select gap day
 function openDropDown() {
     currentStyle = document.getElementById("dropdown-content").getAttribute("style");
-    if (currentStyle === "display: none") {
-        document.getElementById("dropdown-content").setAttribute("style", "display: block");
+    if (currentStyle === "display: none;") {
+        document.getElementById("dropdown-content").setAttribute("style", "display: block;");
     } else {
-        document.getElementById("dropdown-content").setAttribute("style", "display: none");
+        document.getElementById("dropdown-content").setAttribute("style", "display: none;");
     }
 }
 
 function selectDay(event) {
     day = event.target.innerHTML;
     document.getElementById("dropbtn").innerHTML = day + " >";
-    document.getElementById("dropdown-content").setAttribute("style", "display: none");
+    document.getElementById("dropdown-content").setAttribute("style", "display: none;");
 }
 
 function addGap() {
@@ -113,7 +128,7 @@ function addGap() {
     timeNumbers.push((toTime.split(":"))[0]);
     timeNumbers.push((toTime.split(":"))[1]);
     timeNumbers.forEach(timeNumber => {
-        if (!(Number(timeNumber))) {
+        if (Number(timeNumber) !== 0 && !Number(timeNumber)) {
             charFound = true;
         }
     });
@@ -148,9 +163,8 @@ function addGap() {
 function deleteGap(event) {
     let id = event.target.id;
     let gapId = (id.split('_'))[0];
-    console.log(gapId)
     let gap = document.getElementById(gapId);
-    // addedGaps.splice(addedCourses.indexOf(courseId.toUpperCase()), 1);
+    addedGaps.splice(addedGaps.indexOf(gapId.toUpperCase()), 1);
     gap.outerHTML = "";
 }
 
@@ -166,4 +180,118 @@ function twelveTo24(time, amString) {
     if (hour.length < 2) hour = "0" + hour;
     if (min.length < 2) min = "0" + min;
     return hour + min;
+}
+
+function yesNoBtn(event) {
+    const id = event.target.id;
+    let splitted = id.split("-");
+    let key = splitted[0];
+    let value = splitted[1] === "yes" ? true : false;
+    value = !value;
+
+    const antiId = key + "-" + (value ? "yes" : "no"); 
+
+    let style = "display: flex;";
+    let antiStyle = "display: none;"
+
+    if(key === "st") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        st = value;
+    } 
+    else if(key === "mw") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        mw = value;
+    } 
+    else if(key === "ra") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        mw = value;
+    } 
+    else if(key === "f") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        f = value;
+    }
+    else if(key === "avoid_long_gaps") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        avoidLongGaps = value;
+
+        if(keepLongGaps && avoidLongGaps) {
+            keepLongGaps = !keepLongGaps;
+            document.getElementById("keep_long_gaps-yes").setAttribute("style", "display: none;");
+            document.getElementById("keep_long_gaps-no").setAttribute("style", "display: flex;");
+        }
+    }
+    else if(key === "keep_long_gaps") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        keepLongGaps = value;
+
+        if(keepLongGaps && avoidLongGaps) {
+            avoidLongGaps = !avoidLongGaps;
+            document.getElementById("avoid_long_gaps-yes").setAttribute("style", "display: none;");
+            document.getElementById("avoid_long_gaps-no").setAttribute("style", "display: flex;");
+        }
+    }
+    else if(key === "avoid_prayer_times") {
+        document.getElementById(id).setAttribute("style", antiStyle);
+        document.getElementById(antiId).setAttribute("style", style);
+        avoidPrayerTimes = value;
+    }
+}
+
+function plusBtn(event) {
+    id = event.target.id;
+    if(id === "preferred-class-days-plus") {
+        let value = Number(document.getElementById("preferred-class-days").innerHTML);
+        if(value < 99) value++;
+        preferredClassDays = value;
+        document.getElementById("preferred-class-days").innerHTML = value;
+    } 
+    else if(id === "max-back-to-back-classes-plus") {
+        let value = Number(document.getElementById("max-back-to-back-classes").innerHTML);
+        if(value < 99) value++;
+        maxBackToBackClasses = value;
+        document.getElementById("max-back-to-back-classes").innerHTML = value;
+    } 
+    else if(id === "max-classes-plus") {
+        let value = Number(document.getElementById("max-classes").innerHTML);
+        if(value < 99) value++;
+        maxClasses = value;
+        document.getElementById("max-classes").innerHTML = value;
+    } 
+    else if(id === "max-finals-plus") {
+        let value = Number(document.getElementById("max-finals").innerHTML);
+        if(value < 99) value++;
+        maxFinal = value;
+        document.getElementById("max-finals").innerHTML = value;
+    }
+}
+
+function minusBtn(event) {
+    id = event.target.id;
+    if(id === "preferred-class-days-minus") {
+        let value = Number(document.getElementById("preferred-class-days").innerHTML);
+        if(value > 1) value--;
+        preferredClassDays = value;
+        document.getElementById("preferred-class-days").innerHTML = value;
+    } else if(id === "max-back-to-back-classes-minus") {
+        let value = Number(document.getElementById("max-back-to-back-classes").innerHTML);
+        if(value > 1) value--;
+        maxBackToBackClasses = value;
+        document.getElementById("max-back-to-back-classes").innerHTML = value;
+    } else if(id === "max-classes-minus") {
+        let value = Number(document.getElementById("max-classes").innerHTML);
+        if(value > 1) value--;
+        maxClasses = value;
+        document.getElementById("max-classes").innerHTML = value;
+    } else if(id === "max-finals-minus") {
+        let value = Number(document.getElementById("max-finals").innerHTML);
+        if(value > 1) value--;
+        maxFinal = value;
+        document.getElementById("max-finals").innerHTML = value;
+    }
 }
