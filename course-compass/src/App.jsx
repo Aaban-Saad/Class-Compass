@@ -7,12 +7,8 @@ function App() {
 
   return (
     <>
-      <div id='bg'>
-        <ScrollArea size="1" type="always" scrollbars="vertical">
-          <Home />
-          <Footer />
-        </ScrollArea>
-      </div>
+      <Home />
+      <Footer />
     </>
   )
 }
