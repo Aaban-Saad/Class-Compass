@@ -27,5 +27,6 @@ dist-ssr
 src/assets/*
 
 # Except for the bg
-!src/assets/bg.png
+!src/assets/bg_light.png
+!src/assets/bg_dark.png
 
