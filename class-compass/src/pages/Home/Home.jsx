@@ -17,7 +17,7 @@ function Home() {
             <Flex mt="5" gap="4" align="center">
               <Text>ST (Sunday - Tuesday)</Text>
             </Flex>
-            <Table.Root variant="surface">
+            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -99,7 +99,7 @@ function Home() {
             <Flex mt="5" gap="4" align="center">
               <Text>MW (Sunday - Tuesday)</Text>
             </Flex>
-            <Table.Root variant="surface">
+            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -135,7 +135,7 @@ function Home() {
             <Flex mt="5" gap="4" align="center">
               <Text>RA (Sunday - Tuesday)</Text>
             </Flex>
-            <Table.Root variant="surface">
+            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -171,7 +171,7 @@ function Home() {
             <Flex mt="5" gap="4" align="center">
               <Text>F (Friday)</Text>
             </Flex>
-            <Table.Root variant="surface">
+            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
