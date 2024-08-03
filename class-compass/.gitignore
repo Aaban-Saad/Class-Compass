@@ -30,3 +30,4 @@ src/assets/*
 !src/assets/bg_light.png
 !src/assets/bg_dark.png
 
+.vercel
