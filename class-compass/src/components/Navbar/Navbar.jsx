@@ -9,7 +9,6 @@ function Navbar(props) {
 
   return (
     <>
-      test 2
       <Box style={{ zIndex:999, background: 'var(--indigo-2)', boxShadow: "var(--shadow-3", position: "fixed", width:"100vw", padding: "10px" }}>
         <Container>
           <Button variant="soft" onClick={toggleTheme}>
