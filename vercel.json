@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/fetch-html",
+      "destination": "/api/fetch-html.js"
+    }
+  ]
+}
+
