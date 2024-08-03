@@ -3,7 +3,8 @@ function Home() {
   return (
     <>
       <Flex justify="center" align="center" gap="3" direction="column" p="5">
-        <Heading size={{ initial: "8", md: "9" }}>Class Compass</Heading>
+        <img height="40px" src="./src/assets/logo.png" alt="logo" />
+        <Heading color="iris" size={{ initial: "8", md: "9" }}>Class <span className="gradient-animation">Compass</span></Heading>
         <Heading color="gray" size="4">A more organized way for NSUers to look up courses and more...</Heading>
 
         <Box maxWidth="300px" mt="5">

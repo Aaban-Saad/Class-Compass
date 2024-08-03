@@ -29,5 +29,6 @@ src/assets/*
 # Except for the bg
 !src/assets/bg_light.png
 !src/assets/bg_dark.png
+!src/assets/logo.png
 
 .vercel
