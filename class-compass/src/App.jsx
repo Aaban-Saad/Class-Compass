@@ -14,7 +14,7 @@ function App() {
     const fetchData = async () => {
       try {
         // const response = await fetch('/api/')
-        const response = await fetch('/api/fetch-html')
+        const response = await fetch('https://rds2.northsouth.edu/index.php/common/showofferedcourses')
         if (!response.ok) {
           throw new Error('Network response was not ok')
         }
