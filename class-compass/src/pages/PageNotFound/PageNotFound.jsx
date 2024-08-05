@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar/Navbar"
 function PageNotFound(props) {
   return (
     <>
-      <Navbar setTheme={props.setTheme} />
+      <Navbar theme={props.theme} setTheme={props.setTheme} />
 
       <Flex height={"90vh"}  gap="0" direction="column" justify="center" align="center">
         <Heading size="9">

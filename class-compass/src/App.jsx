@@ -17,9 +17,9 @@ function App() {
   const [error, setError] = useState(null)
   
   const router = createBrowserRouter([
-    {path:"/", element:<Home setTheme={setTheme}/>, errorElement:<PageNotFound setTheme={setTheme}/>},
-    {path:"/planner", element:<Planner setTheme={setTheme}/>},
-    {path:"/notification", element:<Notification setTheme={setTheme}/>}
+    {path:"/", element:<Home theme={theme} setTheme={setTheme}/>, errorElement:<PageNotFound setTheme={setTheme}/>},
+    {path:"/planner", element:<Planner theme={theme} setTheme={setTheme}/>},
+    {path:"/notification", element:<Notification theme={theme} setTheme={setTheme}/>}
   ])
   
   useEffect(() => {

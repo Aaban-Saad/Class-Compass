@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar/Navbar"
 function Notification(props) {
   return (
     <>
-      <Navbar setTheme={props.setTheme} page="notification" />
+      <Navbar theme={props.theme} setTheme={props.setTheme} page="notification" />
       Notification
     </>
   )
