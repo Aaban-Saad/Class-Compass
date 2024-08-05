@@ -1,7 +1,10 @@
 import { Flex, Heading, Box, TextField, Table, Text, Popover, Button, Grid } from "@radix-ui/themes"
-function Home() {
+import Navbar from "../../components/Navbar/Navbar"
+
+function Home(props) {
   return (
     <>
+      <Navbar setTheme={props.setTheme} page="home"/>
       <Flex justify="center" align="center" gap="3" direction="column" p="5">
         <img height="50px" src="logo.png" alt="logo" />
         <Heading color="iris" size={{ initial: "8", md: "9" }}>Class <span className="gradient-animation">Compass</span></Heading>
