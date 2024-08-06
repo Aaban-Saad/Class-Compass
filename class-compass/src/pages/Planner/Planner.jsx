@@ -4,9 +4,9 @@ import Navbar from '../../components/Navbar/Navbar'
 function Planner(props) {
   return (
     <>
-      <Navbar theme={props.theme} setTheme={props.setTheme} page="planner" />
-      <Flex align="center" justify="center" direction="column" gap="3">
-        <Heading size="7" color='indigo'>
+      <Navbar theme={props.theme} setTheme={props.setTheme} page="planner"/>
+      <Flex align="center" justify="center" direction="column" gap="3" p="2">
+        <Heading size="7" color='indigo' ml="3" mr="3">
           Automatic Advising Planner
         </Heading>
         <Card>
