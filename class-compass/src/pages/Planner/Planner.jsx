@@ -5,13 +5,13 @@ function Planner(props) {
   return (
     <>
       <Navbar theme={props.theme} setTheme={props.setTheme} page="planner" />
-      <Flex align="center" justify="center" direction="column" gap="3" p="3">
+      <Flex align="center" justify="center" direction="column" gap="3">
         <Heading size="7" color='indigo'>
           Automatic Advising Planner
         </Heading>
         <Card>
           <Flex direction={{ initial: "column", md: "row" }} gap="5">
-            <Card style={{ boxShadow: "var(--shadow-3", width: "360px" }}>
+            <Card style={{ boxShadow: "var(--shadow-3", width: "100%" }}>
               <Flex align="center" direction="column" justify="center" gap="3">
 
                 <Heading size="5">
@@ -67,7 +67,7 @@ function Planner(props) {
               </Flex>
             </Card>
 
-            <Card style={{ boxShadow: "var(--shadow-3", width: "360px" }}>
+            <Card style={{ boxShadow: "var(--shadow-3", width: "100%" }}>
               <Flex align="center" justify="center" direction="column" gap="3">
                 <Heading size="5">
                   Add Gaps
@@ -99,7 +99,7 @@ function Planner(props) {
               </Flex>
             </Card>
 
-            <Card style={{ boxShadow: "var(--shadow-3", width: "360px" }}>
+            <Card style={{ boxShadow: "var(--shadow-3", width: "100%" }}>
               <Flex align="center" justify="center" direction="column" gap="3">
                 <Heading size="5">
                   Advanced Settings
