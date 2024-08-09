@@ -1,7 +1,94 @@
 import { Flex, Heading, Box, TextField, Table, Text, Popover, Button, Grid } from "@radix-ui/themes"
 import Navbar from "../../components/Navbar/Navbar"
+import { useEffect, useState } from "react"
 
 function Home(props) {
+
+  // Data from rds2
+  const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [dayCombinations, setDayCombinations] = useState({})
+  const [course, setCourse] = useState()
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/fetch-html')
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+        const result = await response.text();
+        setData(result)
+        extractTableData(result)
+        // console.log(result)
+      } catch (error) {
+        setError(error)
+      } finally {
+        setLoading(false)
+      }
+    };
+
+    fetchData()
+  }, [])
+
+  
+  const courseInput = (event) => {
+    setCourse(event.target.value)
+    console.log(event.target.value)
+  }
+  
+  // Extract data from rds2
+  const extractTableData = (htmlString) => {
+    // Create a temporary DOM element to parse the HTML string
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+
+    const dayCombinations = {};
+
+    const rows = doc.querySelectorAll('#offeredCourseTbl tbody tr');
+    rows.forEach((row) => {
+      const cells = row.querySelectorAll('td');
+      const course = cells[1].textContent.trim();
+      const section = cells[2].textContent.trim();
+      const faculty = cells[3].textContent.trim();
+      const timeCell = cells[4].textContent.trim();
+      const availableSeats = cells[6].textContent.trim();
+
+      // Split time into days and actual time
+      const [days, time] = timeCell.split(' ');
+
+      const sectionData = {
+        section: section,
+        availableSeats: availableSeats,
+        faculty: faculty,
+      };
+
+      const courseData = {
+        course: course,
+        Time: time,
+        sections: [sectionData],
+      };
+
+      if (!dayCombinations[days]) {
+        dayCombinations[days] = [];
+      }
+
+      const existingCourse = dayCombinations[days].find(
+        (item) => item.course === course && item.Time === time
+      );
+
+      if (existingCourse) {
+        existingCourse.sections.push(sectionData);
+      } else {
+        dayCombinations[days].push(courseData);
+      }
+    });
+
+    setDayCombinations(dayCombinations);
+    console.log(dayCombinations)
+  };
+
   return (
     <>
       <Navbar theme={props.theme} setTheme={props.setTheme} page="home"/>
@@ -11,7 +98,7 @@ function Home(props) {
         <Heading color="gray" size="4">A more organized way for NSUers to look up courses and more...</Heading>
 
         <Box maxWidth="300px" mt="5">
-          <TextField.Root variant="surface" size="3" placeholder="Search course..." />
+          <TextField.Root onChange={courseInput} variant="surface" size="3" placeholder="Search course..." />
         </Box>
 
         <Grid columns={{ initial: "1", md: "2", lg: "3" }} gap="5" width="auto">

@@ -11,37 +11,11 @@ function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") ? localStorage.getItem("theme") : "dark")
   const [bgTheme, setBgTheme] = useState("bg-dark")
   
-  // Data from rds2
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  
   const router = createBrowserRouter([
     {path:"/", element:<Home theme={theme} setTheme={setTheme}/>, errorElement:<PageNotFound setTheme={setTheme}/>},
     {path:"/planner", element:<Planner theme={theme} setTheme={setTheme}/>},
     {path:"/notification", element:<Notification theme={theme} setTheme={setTheme}/>}
   ])
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/fetch-html')
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const result = await response.text()
-        setData(result)
-        console.log(result)
-      } catch (error) {
-        setError(error)
-      } finally {
-        setLoading(false)
-      }
-    };
-
-    fetchData()
-  }, [])
-
 
   useEffect(() => {
     if (theme === "dark") {
