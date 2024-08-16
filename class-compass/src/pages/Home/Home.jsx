@@ -10,6 +10,7 @@ function Home(props) {
   const [loading, setLoading] = useState(true)
   const [dayCombinations, setDayCombinations] = useState({})
   const [course, setCourse] = useState()
+  const [keyPressed, setKeyPressed] = useState()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +22,6 @@ function Home(props) {
         const result = await response.text();
         setData(result)
         extractTableData(result)
-        // console.log(result)
       } catch (error) {
         setError(error)
       } finally {
@@ -29,15 +29,30 @@ function Home(props) {
       }
     };
 
+    const handleSearch = (event) => {
+      setKeyPressed((k) => event.key)
+    };
+
     fetchData()
+
+    document.addEventListener('keydown', handleSearch)
+
+    return () => {
+      document.removeEventListener('keydown', handleSearch);
+    };
   }, [])
 
-  
+  useEffect(() => {
+    if (keyPressed === "Enter") {
+      console.log(course)
+    }
+  }, [keyPressed])
+
+
   const courseInput = (event) => {
     setCourse(event.target.value)
-    console.log(event.target.value)
   }
-  
+
   // Extract data from rds2
   const extractTableData = (htmlString) => {
     // Create a temporary DOM element to parse the HTML string
@@ -66,7 +81,7 @@ function Home(props) {
 
       const courseData = {
         course: course,
-        Time: time,
+        time: time,
         sections: [sectionData],
       };
 
@@ -75,7 +90,7 @@ function Home(props) {
       }
 
       const existingCourse = dayCombinations[days].find(
-        (item) => item.course === course && item.Time === time
+        (item) => item.course === course && item.time === time
       );
 
       if (existingCourse) {
@@ -91,7 +106,9 @@ function Home(props) {
 
   return (
     <>
-      <Navbar theme={props.theme} setTheme={props.setTheme} page="home"/>
+      <Navbar theme={props.theme} setTheme={props.setTheme} page="home" />
+
+
       <Flex justify="center" align="center" gap="3" direction="column" p="5">
         <img height="50px" src="logo.png" alt="logo" />
         <Heading color="iris" size={{ initial: "8", md: "9" }}>Class <span className="gradient-animation">Compass</span></Heading>
@@ -101,14 +118,13 @@ function Home(props) {
           <TextField.Root onChange={courseInput} variant="surface" size="3" placeholder="Search course..." />
         </Box>
 
-        <Grid columns={{ initial: "1", md: "2", lg: "3" }} gap="5" width="auto">
-
+        <Grid columns={{ initial: "1", md: "1", lg: "2" }} gap="5" width="auto">
           {/* Table */}
           <Flex gap="3" direction="column" justify="top" align="center">
             <Flex mt="5" gap="4" align="center">
               <Text>ST (Sunday - Tuesday)</Text>
             </Flex>
-            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
+            <Table.Root variant="surface" style={{ boxShadow: "var(--shadow-5" }}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -118,6 +134,36 @@ function Home(props) {
               </Table.Header>
 
               <Table.Body>
+                {!loading ? (
+                  dayCombinations.ST.map((course, index) => {
+                    return (
+                      <Table.Row key={index}>
+                        <Table.Cell>{course.course}</Table.Cell>
+                        <Table.Cell>{course.time}</Table.Cell>
+                        <Table.Cell>
+                          <Grid columns={{ initial: "2", md: "3", lg: "3" }} gap="1" width="auto">
+                            {course.sections.map((section, index) => {
+                              return (
+                                <Popover.Root key={index}>
+                                  <Popover.Trigger>
+                                    <Button variant="soft">{section.section}</Button>
+                                  </Popover.Trigger>
+                                  <Popover.Content size="1" maxWidth="300px">
+                                    <Text as="p" trim="both" size="1">
+                                      Available Seats: {section.availableSeats}, Faculty: {section.faculty}
+                                    </Text>
+                                  </Popover.Content>
+                                </Popover.Root>
+                              )
+                            })}
+                          </Grid>
+                        </Table.Cell>
+                      </Table.Row>
+                    )
+                  })
+
+                ) : true}
+
                 <Table.Row>
                   <Table.RowHeaderCell>CSE115</Table.RowHeaderCell>
                   <Table.Cell>8:00 am - 9:15 am</Table.Cell>
@@ -190,7 +236,7 @@ function Home(props) {
             <Flex mt="5" gap="4" align="center">
               <Text>MW (Sunday - Tuesday)</Text>
             </Flex>
-            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
+            <Table.Root variant="surface" style={{ boxShadow: "var(--shadow-5" }}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -226,7 +272,7 @@ function Home(props) {
             <Flex mt="5" gap="4" align="center">
               <Text>RA (Sunday - Tuesday)</Text>
             </Flex>
-            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
+            <Table.Root variant="surface" style={{ boxShadow: "var(--shadow-5" }}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -262,7 +308,7 @@ function Home(props) {
             <Flex mt="5" gap="4" align="center">
               <Text>F (Friday)</Text>
             </Flex>
-            <Table.Root variant="surface" style={{boxShadow: "var(--shadow-5"}}>
+            <Table.Root variant="surface" style={{ boxShadow: "var(--shadow-5" }}>
               <Table.Header>
                 <Table.Row>
                   <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
