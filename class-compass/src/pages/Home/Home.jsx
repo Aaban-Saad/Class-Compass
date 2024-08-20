@@ -1,4 +1,4 @@
-import { Flex, Heading, Box, TextField, Table, Text, Popover, Button, Grid } from "@radix-ui/themes"
+import { Flex, Heading, Box, TextField, Table, Text, Popover, Button, Grid, Spinner } from "@radix-ui/themes"
 import Navbar from "../../components/Navbar/Navbar"
 import { useEffect, useState } from "react"
 
@@ -124,18 +124,32 @@ function Home(props) {
   };
 
   return (
-    <div style={{minHeight:"100vh"}}>
+    <div style={{ minHeight: "100vh" }}>
       <Navbar theme={props.theme} setTheme={props.setTheme} page="home" />
 
 
       <Flex justify="center" align="center" gap="3" direction="column" p="5" >
         <img height="50px" src="logo.png" alt="logo" />
         <Heading color="iris" size={{ initial: "8", md: "9" }}>Class <span className="gradient-animation">Compass</span></Heading>
-        <Heading color="gray" size="4">A more organized way for NSUers to look up courses and more...</Heading>
+        <Heading color="gray" size="4">A more organized way for NSUers to look up courses and plan for advising</Heading>
 
-        <Box maxWidth="300px" mt="5">
-          <TextField.Root onChange={(event) => setSearchQuery(event.target.value)} variant="surface" size="3" placeholder="Search course..." />
-        </Box>
+        {loading ?
+          <>
+            <Spinner size="3" />
+            <Text>Fetching offered course list...</Text>
+          </>
+           :
+          <>
+            <Box maxWidth="300px" mt="5">
+              <TextField.Root onChange={(event) => setSearchQuery(event.target.value)} variant="surface" size="3" placeholder="Search course..." />
+            </Box>
+          </>
+        }
+
+        {
+          (!loading & !loadedSearchResult) ?
+          <Heading>Search for a course</Heading> : true
+        }
 
         {
           (!loading & loadedSearchResult) ?
@@ -188,8 +202,7 @@ function Home(props) {
                   })
                 }
               </Grid>
-            ) :
-            <Heading>Search for a course</Heading>
+            ) : true
         }
       </Flex>
     </div>
