@@ -33,7 +33,7 @@ function App() {
   return (
     <>
       <Theme className={bgTheme} appearance={theme} accentColor='sky'>
-        <RouterProvider router={router}/>
+        <RouterProvider router={router} />
         <Footer />
       </Theme>
     </>

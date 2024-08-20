@@ -3,7 +3,7 @@ import Navbar from '../../components/Navbar/Navbar'
 
 function Planner(props) {
   return (
-    <>
+    <div style={{minHeight:"100vh"}}>
       <Navbar theme={props.theme} setTheme={props.setTheme} page="planner"/>
       <Flex align="center" justify="center" direction="column" gap="3" p="2">
         <Heading size="7" color='indigo' ml="3" mr="3">
@@ -263,7 +263,7 @@ function Planner(props) {
           </Flex>
         </Card>
       </Flex>
-    </>
+    </div>
   )
 }
 
