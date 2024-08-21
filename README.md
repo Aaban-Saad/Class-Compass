@@ -19,3 +19,6 @@ However, after running it like this, it cannot fetch data from rds2. Because, it
 - ### Back End
     - No back end server
     - Uses Vercel's serverless function to fetch data from rds2 (Offered Course List).
+ 
+### Website
+https://class-compass.vercel.app/
