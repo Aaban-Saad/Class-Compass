@@ -20,9 +20,7 @@ function Planner(props) {
 
   useEffect(() => {
     if (keyPressed === "Enter") {
-      console.log("enter")
-      setCourses((prev) => [...prev, course])
-      console.log("courses = " + courses)
+      addCourse(course)
     }
   }, [keyPressed])
 
@@ -31,6 +29,12 @@ function Planner(props) {
       prev.filter((item, index) => index !== indexToRemove)
     );
   };
+
+  const addCourse = (course) => {
+    if(course !== "" && !courses.includes(course)) {
+      setCourses((prev) => [...prev, course])
+    }
+  }
 
 
   return (
@@ -50,7 +54,7 @@ function Planner(props) {
                 </Heading>
                 <Flex gap="2" justify="center" align="center">
                   <TextField.Root size="2" onChange={(event) => setCourse(event.target.value)} placeholder="Course Name" />
-                  <Button color="green" onClick={() => {setCourses((prev) => [...prev, course])}}>
+                  <Button color="green" onClick={() => addCourse(course)}>
                     Add
                   </Button>
                 </Flex>
