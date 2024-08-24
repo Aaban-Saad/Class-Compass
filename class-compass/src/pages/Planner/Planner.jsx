@@ -3,9 +3,19 @@ import Navbar from '../../components/Navbar/Navbar'
 import { useEffect, useState } from 'react'
 
 function Planner(props) {
-  const [courses, setCourses] = useState([])
-  const [course, setCourse] = useState("")
   const [keyPressed, setKeyPressed] = useState(null)
+  const [course, setCourse] = useState("")
+  const [courses, setCourses] = useState([])
+  const [gaps, setGaps] = useState([])
+  const [gapFrom, setGapFrom] = useState()
+  const [gapTo, setGapTo] = useState()
+  const [gapFromAm, setGapFromAm] = useState("am")
+  const [gapToAm, setGapToAm] = useState("am")
+  const [gapDay, setGapDay] = useState("All Days")
+  const [coursesInADay, setCoursesInADay] = useState({ 's': 0, 't': 0, 'm': 0, 'w': 0, 'r': 0, 'a': 0, 'f': 0, })
+  const [totalDaysTaken, setTotalDaysTaken] = useState(0)
+
+  const timeSlots = [480, 565, 650, 735, 820, 905, 990, 1075, 1160, 1245, 1330] // In minutes
 
   useEffect(() => {
     const handleKeyDown = (e) => setKeyPressed(e.key);
@@ -24,17 +34,52 @@ function Planner(props) {
     }
   }, [keyPressed])
 
+  
+  const addCourse = (course) => {
+    if (course !== "" && !courses.includes(course)) {
+      setCourses((prev) => [...prev, course])
+    }
+  }
+  
   const removeCourse = (indexToRemove) => {
-    setCourses((prev) => 
+    setCourses((prev) =>
       prev.filter((item, index) => index !== indexToRemove)
     );
   };
 
-  const addCourse = (course) => {
-    if(course !== "" && !courses.includes(course)) {
-      setCourses((prev) => [...prev, course])
-    }
+  const addGap = () => {
+    const gapTime = (gapDay + " " + gapFrom + " " + gapFromAm + " - " + gapTo + " " + gapToAm).toUpperCase()
+    setGaps((prev) => [...prev, gapTime])
+    console.log(gaps)
   }
+
+  const removeGap = (indexToRemove) => {
+    setGaps((prev) =>
+      prev.filter((item, index) => index !== indexToRemove)
+    );
+  };
+
+  const timeToMinutes = (timeStr) => {
+    // Extract the time and period (AM/PM)
+    const time = timeStr.split(' ')[1]
+    const period = timeStr.split(' ')[2]
+
+    // Split the hour and minute
+    let [hour, minute] = time.split(':').map(Number)
+
+    // Convert hour to 24-hour format
+    if (period === 'PM' && hour !== 12) {
+      hour += 12
+    } else if (period === 'AM' && hour === 12) {
+      hour = 0
+    }
+
+    const totalMinutes = hour * 60 + minute
+
+    return totalMinutes
+  }
+
+
 
 
   return (
@@ -60,9 +105,9 @@ function Planner(props) {
                 </Flex>
 
                 <Card mt="2">
-                  <Grid columns={{ initial: "2", md: "3" }} gap="3" width="auto">
+                  <Grid columns={{ initial: "2", md: "3" }} gap="3" width="100%">
                     {courses.map((item, index) => {
-                      return(
+                      return (
                         <Badge key={index} variant='surface' size="3" color="iris">
                           <span style={{ maxWidth: "70px", overflow: 'hidden' }}>
                             {item}
@@ -85,27 +130,44 @@ function Planner(props) {
                 </Heading>
                 <Flex justify="center" align="center" gap="1">
                   <span>From: </span>
-                  <TextField.Root style={{ width: "70px" }} size="2" placeholder="hh:mm" />
-                  <Button variant='surface' color='green' size="1">am</Button>
+                  <TextField.Root onChange={(e) => setGapFrom(e.target.value)} style={{ width: "70px" }} size="2" placeholder="hh:mm" />
+                  <Button onClick={() => { setGapFromAm(gapFromAm === "am" ? "pm" : "am") }} variant='surface' color='green' size="1">{gapFromAm}</Button>
                   <span>To: </span>
-                  <TextField.Root style={{ width: "70px" }} size="2" placeholder="hh:mm" />
-                  <Button variant='surface' color='green' size="1">am</Button>
+                  <TextField.Root onChange={(e) => setGapTo(e.target.value)} style={{ width: "70px" }} size="2" placeholder="hh:mm" />
+                  <Button onClick={() => { setGapToAm(gapToAm === "am" ? "pm" : "am") }} variant='surface' color='green' size="1">{gapToAm}</Button>
                 </Flex>
-                <Select.Root defaultValue="All Days">
-                  <Select.Trigger />
-                  <Select.Content>
-                    <Select.Group>
-                      <Select.Label>Fruits</Select.Label>
-                      <Select.Item value="All Days">All Days</Select.Item>
-                      <Select.Item value="ST">ST</Select.Item>
-                      <Select.Item value="MW">MW</Select.Item>
-                      <Select.Item value="RA">RA</Select.Item>
-                      <Select.Item value="F">F</Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-                </Select.Root>
-                <Card>
 
+                <Flex align="center" justify="center" gap="2">
+                  <Select.Root onValueChange={(value) => setGapDay(value)} defaultValue="All Days">
+                    <Select.Trigger />
+                    <Select.Content>
+                      <Select.Group>
+                        <Select.Label>Days</Select.Label>
+                        <Select.Item value="All Days">All Days</Select.Item>
+                        <Select.Item value="ST">ST</Select.Item>
+                        <Select.Item value="MW">MW</Select.Item>
+                        <Select.Item value="RA">RA</Select.Item>
+                        <Select.Item value="F">F</Select.Item>
+                      </Select.Group>
+                    </Select.Content>
+                  </Select.Root>
+                  <Button onClick={() => addGap()} color='green'>Add Gap</Button>
+                </Flex>
+                <Card mt="2">
+                  <Grid columns="1" gap="3" width="auto">
+                    {gaps.map((item, index) => {
+                      return (
+                        <Badge key={index} variant='surface' size="3" color="iris">
+                          <span style={{ maxWidth: "150px", overflow: 'hidden' }}>
+                            {item}
+                          </span>
+                          <Button onClick={() => removeGap(index)} color='red' size="1" variant='surface'>
+                            <svg width="10" height="10" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.8536 2.85355C13.0488 2.65829 13.0488 2.34171 12.8536 2.14645C12.6583 1.95118 12.3417 1.95118 12.1464 2.14645L7.5 6.79289L2.85355 2.14645C2.65829 1.95118 2.34171 1.95118 2.14645 2.14645C1.95118 2.34171 1.95118 2.65829 2.14645 2.85355L6.79289 7.5L2.14645 12.1464C1.95118 12.3417 1.95118 12.6583 2.14645 12.8536C2.34171 13.0488 2.65829 13.0488 2.85355 12.8536L7.5 8.20711L12.1464 12.8536C12.3417 13.0488 12.6583 13.0488 12.8536 12.8536C13.0488 12.6583 13.0488 12.3417 12.8536 12.1464L8.20711 7.5L12.8536 2.85355Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
+                          </Button>
+                        </Badge>
+                      )
+                    })}
+                  </Grid>
                 </Card>
               </Flex>
             </Card>
