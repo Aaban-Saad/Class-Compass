@@ -158,7 +158,7 @@ function Planner(props) {
                     {gaps.map((item, index) => {
                       return (
                         <Badge key={index} variant='surface' size="3" color="iris">
-                          <span style={{ maxWidth: "150px", overflow: 'hidden' }}>
+                          <span style={{ maxWidth: "200px", overflow: 'hidden' }}>
                             {item}
                           </span>
                           <Button onClick={() => removeGap(index)} color='red' size="1" variant='surface'>
