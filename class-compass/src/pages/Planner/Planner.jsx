@@ -58,10 +58,11 @@ function Planner(props) {
 
     const gapTime = (gapDay + " " + gapFrom + " " + gapFromAm + " - " + gapTo + " " + gapToAm).toUpperCase()
     let timeInMinutes = timeToMinutes(gapTime)
-    if(timeInMinutes.startTime > timeInMinutes.endTime) return
+    if(timeInMinutes.startTime >= timeInMinutes.endTime) return
 
-    setGaps((prev) => [...prev, gapTime])
-    console.log(gaps)
+    if (gapTime !== "" && !gaps.includes(gapTime)) {
+      setGaps((prev) => [...prev, gapTime])
+    }
   }
 
   const removeGap = (indexToRemove) => {
