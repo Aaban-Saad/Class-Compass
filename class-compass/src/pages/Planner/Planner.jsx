@@ -7,11 +7,11 @@ function Planner(props) {
   const [course, setCourse] = useState("")
   const [courses, setCourses] = useState([])
   const [gaps, setGaps] = useState([])
-  const [gapFrom, setGapFrom] = useState()
-  const [gapTo, setGapTo] = useState()
+  const [gapFrom, setGapFrom] = useState("")
+  const [gapTo, setGapTo] = useState("")
   const [gapFromAm, setGapFromAm] = useState("am")
   const [gapToAm, setGapToAm] = useState("am")
-  const [gapDay, setGapDay] = useState("All Days")
+  const [gapDay, setGapDay] = useState("All-Days")
   const [coursesInADay, setCoursesInADay] = useState({ 's': 0, 't': 0, 'm': 0, 'w': 0, 'r': 0, 'a': 0, 'f': 0, })
   const [totalDaysTaken, setTotalDaysTaken] = useState(0)
 
@@ -34,21 +34,32 @@ function Planner(props) {
     }
   }, [keyPressed])
 
-  
+
   const addCourse = (course) => {
     if (course !== "" && !courses.includes(course)) {
       setCourses((prev) => [...prev, course])
     }
   }
-  
+
   const removeCourse = (indexToRemove) => {
     setCourses((prev) =>
       prev.filter((item, index) => index !== indexToRemove)
     );
   };
 
+  function validTime(str) {
+    return /^[0-9:]+$/.test(str)
+  }
+
   const addGap = () => {
+    if ((gapFrom.length != 5) || (gapTo.length != 5)) return
+    if ((gapFrom.charAt(2) !== ':') || (gapTo.charAt(2) !== ':')) return
+    if (!validTime(gapFrom) || !validTime(gapTo)) return
+
     const gapTime = (gapDay + " " + gapFrom + " " + gapFromAm + " - " + gapTo + " " + gapToAm).toUpperCase()
+    let timeInMinutes = timeToMinutes(gapTime)
+    if(timeInMinutes.startTime > timeInMinutes.endTime) return
+
     setGaps((prev) => [...prev, gapTime])
     console.log(gaps)
   }
@@ -60,23 +71,55 @@ function Planner(props) {
   };
 
   const timeToMinutes = (timeStr) => {
-    // Extract the time and period (AM/PM)
-    const time = timeStr.split(' ')[1]
-    const period = timeStr.split(' ')[2]
+    try {
+      // Split the input string by the dash to separate start and end times
+      const [daysAndStartTime, endTimePart] = timeStr.split(' - ')
 
-    // Split the hour and minute
-    let [hour, minute] = time.split(':').map(Number)
+      if (!daysAndStartTime || !endTimePart) {
+        throw new Error('Invalid format: Missing start or end time.')
+      }
 
-    // Convert hour to 24-hour format
-    if (period === 'PM' && hour !== 12) {
-      hour += 12
-    } else if (period === 'AM' && hour === 12) {
-      hour = 0
+      // Split the start time part to extract days, start time, and start period (AM/PM)
+      const [days, startTime, startPeriod] = daysAndStartTime.split(' ')
+
+      // Split the end time part to extract end time and end period (AM/PM)
+      const [endTime, endPeriod] = endTimePart.split(' ')
+
+      if (!days || !startTime || !startPeriod || !endTime || !endPeriod) {
+        throw new Error('Invalid format: Missing time components.')
+      }
+
+      // Helper function to validate time and convert to minutes
+      const convertToMinutes = (time, period) => {
+        let [hour, minute] = time.split(':').map(Number);
+
+        // Validate hour and minute
+        if (hour < 1 || hour > 12 || minute < 0 || minute >= 60) {
+          throw new Error(`Invalid time: ${time} ${period}`)
+        }
+
+        // Convert hour to 24-hour format
+        if (period === 'PM' && hour !== 12) {
+          hour += 12
+        } else if (period === 'AM' && hour === 12) {
+          hour = 0;
+        }
+
+        return hour * 60 + minute
+      };
+
+      // Calculate starting and ending minutes
+      const startMinutes = convertToMinutes(startTime, startPeriod);
+      const endMinutes = convertToMinutes(endTime, endPeriod)
+
+      return {
+        days: days,
+        startTime: startMinutes,
+        endTime: endMinutes,
+      };
+    } catch (error) {
+      return { error: error.message }
     }
-
-    const totalMinutes = hour * 60 + minute
-
-    return totalMinutes
   }
 
 
@@ -138,12 +181,12 @@ function Planner(props) {
                 </Flex>
 
                 <Flex align="center" justify="center" gap="2">
-                  <Select.Root onValueChange={(value) => setGapDay(value)} defaultValue="All Days">
+                  <Select.Root onValueChange={(value) => setGapDay(value)} defaultValue="All-Days">
                     <Select.Trigger />
                     <Select.Content>
                       <Select.Group>
                         <Select.Label>Days</Select.Label>
-                        <Select.Item value="All Days">All Days</Select.Item>
+                        <Select.Item value="All-Days">All Days</Select.Item>
                         <Select.Item value="ST">ST</Select.Item>
                         <Select.Item value="MW">MW</Select.Item>
                         <Select.Item value="RA">RA</Select.Item>
