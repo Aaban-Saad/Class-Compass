@@ -12,6 +12,18 @@ function Planner(props) {
   const [gapFromAm, setGapFromAm] = useState("am")
   const [gapToAm, setGapToAm] = useState("am")
   const [gapDay, setGapDay] = useState("All-Days")
+
+  const [stPossible, setStPossible] = useState(true)
+  const [mwPossible, setMwPossible] = useState(true)
+  const [raPossible, setRaPossible] = useState(true)
+  const [fPossible, setFPossible] = useState(true)
+  const [preferredClassDays, setPreferredDays] = useState(4)
+  const [maxClassesPerDay, setMaxClassesPerDay] = useState(4)
+  const [maxBtoBClasses, setMaxBtoBClasses] = useState(4)
+  const [avoidLongGaps, setAvoidLongGaps] = useState(false)
+  const [keepLongGaps, setKeepLongGaps] = useState(false)
+  const [avoidPrayerTimes, setAvoidPrayerTimes] = useState(true)
+
   const [coursesInADay, setCoursesInADay] = useState({ 's': 0, 't': 0, 'm': 0, 'w': 0, 'r': 0, 'a': 0, 'f': 0, })
   const [totalDaysTaken, setTotalDaysTaken] = useState(0)
 
@@ -229,17 +241,17 @@ function Planner(props) {
                     </IconButton>
                     Possible Class Days:
                   </Flex>
-                  <CheckboxCards.Root size="1" defaultValue={['1']} columns="4">
-                    <CheckboxCards.Item value="1">
+                  <CheckboxCards.Root size="1" defaultValue={['1', '2', '3', '4']} columns="4">
+                    <CheckboxCards.Item value="1" onClick={() => setStPossible(!stPossible)}>
                       ST
                     </CheckboxCards.Item>
-                    <CheckboxCards.Item value="2">
+                    <CheckboxCards.Item value="2" onClick={() => setMwPossible(!mwPossible)}>
                       MW
                     </CheckboxCards.Item>
-                    <CheckboxCards.Item value="3">
+                    <CheckboxCards.Item value="3" onClick={() => setRaPossible(!raPossible)}>
                       RA
                     </CheckboxCards.Item>
-                    <CheckboxCards.Item value="4">
+                    <CheckboxCards.Item value="4" onClick={() => setFPossible(!fPossible)}>
                       F
                     </CheckboxCards.Item>
 
@@ -256,11 +268,17 @@ function Planner(props) {
                     </Flex>
 
                     <Flex justify="center" align="center" gap="2">
-                      <Button size="1" variant='soft'>
+                      <Button size="1" variant='soft' onClick={() => {
+                        setPreferredDays((prev) => prev - 1)
+                        if(preferredClassDays <= 1) setPreferredDays(() => 1)
+                      }}>
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </Button>
-                      <span>4</span>
-                      <Button size="1" variant='soft'>
+                      <span>{preferredClassDays}</span>
+                      <Button size="1" variant='soft' onClick={() => {
+                        setPreferredDays((prev) => prev + 1)
+                        if(preferredClassDays >= 7) setPreferredDays(() => 7)
+                      }}>
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.75C8 2.47386 7.77614 2.25 7.5 2.25C7.22386 2.25 7 2.47386 7 2.75V7H2.75C2.47386 7 2.25 7.22386 2.25 7.5C2.25 7.77614 2.47386 8 2.75 8H7V12.25C7 12.5261 7.22386 12.75 7.5 12.75C7.77614 12.75 8 12.5261 8 12.25V8H12.25C12.5261 8 12.75 7.77614 12.75 7.5C12.75 7.22386 12.5261 7 12.25 7H8V2.75Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </Button>
                     </Flex>
@@ -277,11 +295,17 @@ function Planner(props) {
                     </Flex>
 
                     <Flex justify="center" align="center" gap="2">
-                      <Button size="1" variant='soft'>
+                      <Button size="1" variant='soft' onClick={() => {
+                        setMaxClassesPerDay((prev) => prev - 1)
+                        if(maxClassesPerDay <= 1) setMaxClassesPerDay(() => 1)
+                      }}>
                         <svg width="20" height="20" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </Button>
-                      <span>4</span>
-                      <Button size="1" variant='soft'>
+                      <span>{maxClassesPerDay}</span>
+                      <Button size="1" variant='soft' onClick={() => {
+                        setMaxClassesPerDay((prev) => prev + 1)
+                        if(maxClassesPerDay >= 24) setMaxClassesPerDay(() => 24)
+                      }}>
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.75C8 2.47386 7.77614 2.25 7.5 2.25C7.22386 2.25 7 2.47386 7 2.75V7H2.75C2.47386 7 2.25 7.22386 2.25 7.5C2.25 7.77614 2.47386 8 2.75 8H7V12.25C7 12.5261 7.22386 12.75 7.5 12.75C7.77614 12.75 8 12.5261 8 12.25V8H12.25C12.5261 8 12.75 7.77614 12.75 7.5C12.75 7.22386 12.5261 7 12.25 7H8V2.75Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </Button>
                     </Flex>
@@ -298,32 +322,17 @@ function Planner(props) {
                     </Flex>
 
                     <Flex justify="center" align="center" gap="2">
-                      <Button size="1" variant='soft'>
+                      <Button size="1" variant='soft' onClick={() => {
+                        setMaxBtoBClasses((prev) => prev - 1)
+                        if(maxBtoBClasses <= 1) setMaxBtoBClasses(() => 1)
+                      }}>
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </Button>
-                      <span>4</span>
-                      <Button size="1" variant='soft'>
-                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.75C8 2.47386 7.77614 2.25 7.5 2.25C7.22386 2.25 7 2.47386 7 2.75V7H2.75C2.47386 7 2.25 7.22386 2.25 7.5C2.25 7.77614 2.47386 8 2.75 8H7V12.25C7 12.5261 7.22386 12.75 7.5 12.75C7.77614 12.75 8 12.5261 8 12.25V8H12.25C12.5261 8 12.75 7.77614 12.75 7.5C12.75 7.22386 12.5261 7 12.25 7H8V2.75Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
-                      </Button>
-                    </Flex>
-                  </Flex>
-                </Card>
-
-                <Card style={{ width: "100%" }}>
-                  <Flex justify="between" align="center" gap="2">
-                    <Flex justify="center" align="center" gap="1" style={{ textAlign: "left" }}>
-                      <IconButton variant='soft'>
-                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM1.82707 7.49972C1.82707 4.36671 4.36689 1.82689 7.49991 1.82689C10.6329 1.82689 13.1727 4.36671 13.1727 7.49972C13.1727 10.6327 10.6329 13.1726 7.49991 13.1726C4.36689 13.1726 1.82707 10.6327 1.82707 7.49972ZM8.24992 4.49999C8.24992 4.9142 7.91413 5.24999 7.49992 5.24999C7.08571 5.24999 6.74992 4.9142 6.74992 4.49999C6.74992 4.08577 7.08571 3.74999 7.49992 3.74999C7.91413 3.74999 8.24992 4.08577 8.24992 4.49999ZM6.00003 5.99999H6.50003H7.50003C7.77618 5.99999 8.00003 6.22384 8.00003 6.49999V9.99999H8.50003H9.00003V11H8.50003H7.50003H6.50003H6.00003V9.99999H6.50003H7.00003V6.99999H6.50003H6.00003V5.99999Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
-                      </IconButton>
-                      Maximum number of finals per day:
-                    </Flex>
-
-                    <Flex justify="center" align="center" gap="2">
-                      <Button size="1" variant='soft'>
-                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
-                      </Button>
-                      <span>4</span>
-                      <Button size="1" variant='soft'>
+                      <span>{maxBtoBClasses}</span>
+                      <Button size="1" variant='soft' onClick={() => {
+                        setMaxBtoBClasses((prev) => prev + 1)
+                        if(maxBtoBClasses >= 24) setMaxBtoBClasses(() => 24)
+                      }}>
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.75C8 2.47386 7.77614 2.25 7.5 2.25C7.22386 2.25 7 2.47386 7 2.75V7H2.75C2.47386 7 2.25 7.22386 2.25 7.5C2.25 7.77614 2.47386 8 2.75 8H7V12.25C7 12.5261 7.22386 12.75 7.5 12.75C7.77614 12.75 8 12.5261 8 12.25V8H12.25C12.5261 8 12.75 7.77614 12.75 7.5C12.75 7.22386 12.5261 7 12.25 7H8V2.75Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </Button>
                     </Flex>
@@ -339,7 +348,7 @@ function Planner(props) {
                       Try to avoid long gaps:
                     </Flex>
 
-                    <Checkbox />
+                    <Checkbox onClick={() => setAvoidLongGaps(!avoidLongGaps)}/>
                   </Flex>
                 </Card>
 
@@ -352,7 +361,7 @@ function Planner(props) {
                       Try to keep long gaps:
                     </Flex>
 
-                    <Checkbox />
+                    <Checkbox onClick={() => setKeepLongGaps(!avoidLongGaps)}/>
                   </Flex>
                 </Card>
 
@@ -365,7 +374,7 @@ function Planner(props) {
                       Avoid prayer times:
                     </Flex>
 
-                    <Checkbox checked />
+                    <Checkbox defaultChecked onClick={() => setAvoidPrayerTimes(!avoidPrayerTimes)}/>
                   </Flex>
                 </Card>
 
