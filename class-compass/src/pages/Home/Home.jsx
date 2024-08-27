@@ -106,21 +106,21 @@ function Home(props) {
       };
 
       if (!dayCombinations[days]) {
-        dayCombinations[days] = [];
+        dayCombinations[days] = []
       }
 
 
       const existingCourse = dayCombinations[days].find(
         (item) => item.course === course && item.time === timeCell
-      );
+      )
 
       if (existingCourse) {
-        existingCourse.sections.push(sectionData);
+        existingCourse.sections.push(sectionData)
       } else {
-        dayCombinations[days].push(courseData);
+        dayCombinations[days].push(courseData)
       }
     });
-    setDayCombinations(dayCombinations);
+    setDayCombinations(dayCombinations)
   };
 
   return (
