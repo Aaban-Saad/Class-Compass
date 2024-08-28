@@ -132,9 +132,7 @@ function Planner(props) {
       for (const courseObj of dayCourses) {
         let courseTimeInMin = timeToMinutes(courseObj.time)
         if (courseObj.course === course && timeInMin.startTime === courseTimeInMin.startTime && timeInMin.days === courseTimeInMin.days) {
-          // return courseObj.sections;
-          console.log(courseObj)
-          console.log(courseObj.sections)
+          return courseObj.sections;
         }
       }
     }
@@ -145,7 +143,7 @@ function Planner(props) {
 
   const addCourse = (course) => {
     if (course !== "" && !courses.hasOwnProperty(course)) {
-      setCourses((prev) => ({ ...prev, [course]: { taken: false, days: "none" } }))
+      setCourses((prev) => ({ ...prev, [course.toUpperCase()]: { taken: false, days: "none" } }))
     }
   }
 
@@ -234,7 +232,9 @@ function Planner(props) {
     }
   }
 
-
+  const planAdvising = () => {
+    console.log("plan")
+  }
 
 
   return (
@@ -483,7 +483,7 @@ function Planner(props) {
                 </Flex>
               </Card>
             </Flex>
-            <Button color='green'>Proceed</Button>
+            <Button onClick={() => planAdvising()} color='green'>Proceed</Button>
           </Flex>
         </Card>
 
