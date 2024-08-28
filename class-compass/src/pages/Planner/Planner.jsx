@@ -463,7 +463,7 @@ function Planner(props) {
                         Try to keep long gaps:
                       </Flex>
 
-                      <Checkbox onClick={() => setKeepLongGaps(!avoidLongGaps)} />
+                      <Checkbox onClick={() => setKeepLongGaps(!keepLongGaps)} />
                     </Flex>
                   </Card>
 
