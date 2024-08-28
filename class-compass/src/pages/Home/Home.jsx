@@ -29,11 +29,11 @@ function Home(props) {
       } finally {
         setLoading(false)
       }
-    };
+    }
 
     const handleSearch = (event) => {
       setKeyPressed((k) => event.key)
-    };
+    }
 
     fetchData()
 
@@ -41,7 +41,7 @@ function Home(props) {
 
     return () => {
       document.removeEventListener('keydown', handleSearch);
-    };
+    }
   }, [])
 
   // This is for search functionality
@@ -121,6 +121,7 @@ function Home(props) {
       }
     });
     setDayCombinations(dayCombinations)
+    // console.log(dayCombinations)
   };
 
   return (
