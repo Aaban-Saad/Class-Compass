@@ -32,6 +32,7 @@ function Planner(props) {
   const [coursesInADay, setCoursesInADay] = useState({ 's': 0, 't': 0, 'm': 0, 'w': 0, 'r': 0, 'a': 0, 'f': 0, })
   const [totalDaysTaken, setTotalDaysTaken] = useState(0)
 
+  const days = ['s', 't', 'm', 'w', 'r', 'a', 'f']
   const timeSlots = [480, 565, 650, 735, 820, 905, 990, 1075, 1160, 1245, 1330] // In minutes
 
   useEffect(() => {
@@ -50,9 +51,9 @@ function Planner(props) {
         setLoading(false)
       }
     };
-    
+
     const handleKeyDown = (e) => setKeyPressed(e.key)
-    
+
     fetchData()
 
     document.addEventListener('keydown', handleKeyDown);
@@ -120,30 +121,30 @@ function Planner(props) {
     setDayCombinations(dayCombinations)
     console.log(dayCombinations)
 
-    const sections = findSections(dayCombinations, "CSE115", "ST 08:00 AM - 09:15 AM");
+    const sections = findSections(dayCombinations, "CSE225", "480", "S");
     console.log(sections);
   };
 
-  const findSections = (schedule, course, time) => {
+  const findSections = (schedule, course, begTime, days) => {
     for (const day in schedule) {
-      const dayCourses = schedule[day];
+      const dayCourses = schedule[day]
       // console.log(dayCourses)
-      const timeInMin = timeToMinutes(time)
       for (const courseObj of dayCourses) {
         let courseTimeInMin = timeToMinutes(courseObj.time)
-        if (courseObj.course === course && timeInMin.startTime === courseTimeInMin.startTime && timeInMin.days === courseTimeInMin.days) {
-          return courseObj.sections;
+        // console.log(courseObj.course, begTime, courseTimeInMin.startTime, courseTimeInMin.days, days)
+        if (courseObj.course === course && begTime == courseTimeInMin.startTime && (courseTimeInMin.days).includes(days)) {
+          return courseObj
         }
       }
     }
-    
-    return []; // Return an empty array if no match is found
-  };
+
+    return {}
+  }
 
 
   const addCourse = (course) => {
     if (course !== "" && !courses.hasOwnProperty(course)) {
-      setCourses((prev) => ({ ...prev, [course.toUpperCase()]: { taken: false, days: "none" } }))
+      setCourses((prev) => ({ ...prev, [course.toUpperCase()]: { taken: false, time: "none", sections: [] } }))
     }
   }
 
@@ -232,8 +233,64 @@ function Planner(props) {
     }
   }
 
+  function isTimeTaken(day, begTime) {
+    day = day.toUpperCase()
+    for (let c in courses) {
+      let timeInMin = timeToMinutes(courses[c].time)
+      console.log("lol +. ", c,timeInMin, begTime)
+      try {
+        if ((timeInMin.days).includes(day) && timeInMin.startTime <= begTime && timeInMin.endTime >= begTime) {
+          console.log("lol success")
+          return true;
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    return false;
+  }
+
+  function isTimeGap(day, begTime) {
+    gaps.forEach(gap => {
+      let timeInMin = timeToMinutes(gap)
+      try {
+        if ((timeInMin.days).includes(day) && timeInMin.startTime <= begTime && timeInMin.endTime >= begTime) {
+          return true;
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+    return false;
+  }
+
   const planAdvising = () => {
-    console.log("plan")
+    for (let c in courses) {
+      console.log("oh my course -> ", c)
+      for (let i = 0; i < days.length; i++) {
+        if (courses[c].taken) break
+        let day = days[i].toUpperCase()
+        for (let j = 0; j < timeSlots.length; j++) {
+          console.log(isTimeTaken(day, timeSlots[j]), isTimeGap(day, timeSlots[j]))
+          if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
+            let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
+            console.log(c, timeSlots[j], day.toUpperCase(), courseObj)
+            if (!('course' in courseObj)) {
+              continue
+            } else {
+              // setCourses((prev) => ({ ...prev, [c.toUpperCase()]: { taken: true, time: courseObj.time, sections: courseObj.sections } }))
+              courses[c].taken = true
+              courses[c].time = courseObj.time
+              courses[c].sections = courseObj.sections
+              break
+            }
+          }
+        }
+      }
+    }
+
+    console.log(courses)
+
   }
 
 
