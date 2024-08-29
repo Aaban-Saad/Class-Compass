@@ -276,12 +276,39 @@ function Planner(props) {
   
 
   const planAdvising = () => {
+    // Resetting previous advising
     for (let c in courses) {
+      courses[c].taken = false
+    }
+
+    for (let c in courses) { // >>> For each course... <<<
       console.log("oh my course -> ", c)
-      for (let i = 0; i < days.length; i++) {
+      for (let i = 0; i < days.length; i++) { // >>> For each day... <<<
         if (courses[c].taken) break
+
+        // Filtering possible class days
+        if((days[i].toUpperCase() === 'S' ||
+             days[i].toUpperCase() === 'T') &&
+            !stPossible) {
+              continue
+        }
+        else if((days[i].toUpperCase() === 'M' ||
+             days[i].toUpperCase() === 'W') &&
+            !mwPossible) {
+              continue
+        }
+        else if((days[i].toUpperCase() === 'R' ||
+             days[i].toUpperCase() === 'A') &&
+            !raPossible) {
+              continue
+        }
+        else if(days[i].toUpperCase() === 'F' &&
+            !fPossible) {
+              continue
+        }
+
         let day = days[i].toUpperCase()
-        for (let j = 0; j < timeSlots.length; j++) {
+        for (let j = 0; j < timeSlots.length; j++) { // >>> For each time slot... Advise <<<
           console.log(isTimeTaken(day, timeSlots[j]), isTimeGap(day, timeSlots[j]))
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
