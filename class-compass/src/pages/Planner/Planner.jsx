@@ -237,31 +237,43 @@ function Planner(props) {
     day = day.toUpperCase()
     for (let c in courses) {
       let timeInMin = timeToMinutes(courses[c].time)
-      console.log("lol +. ", c, timeInMin, begTime, day, day.includes(timeInMin.days))
       try {
-        if (((timeInMin.days).includes(day) || day.includes(timeInMin.days)) && timeInMin.startTime <= begTime && timeInMin.endTime >= begTime) {
-          return true;
+        if (((timeInMin.days).includes(day) ||
+              day.includes(timeInMin.days)) &&
+            timeInMin.startTime <= begTime &&
+            timeInMin.endTime >= begTime) {
+          return true
         }
       } catch (error) {
-        console.log(error)
+        // Do nothing
+        true
       }
     }
     return false;
   }
 
   function isTimeGap(day, begTime) {
-    gaps.forEach(gap => {
-      let timeInMin = timeToMinutes(gap)
+    for (let gap of gaps) {
+      let timeInMin = timeToMinutes(gap);
+      console.log(gap, timeInMin, begTime, timeInMin.startTime <= begTime && timeInMin.endTime >= begTime);
       try {
-        if ((timeInMin.days).includes(day) && timeInMin.startTime <= begTime && timeInMin.endTime >= begTime) {
+        if (
+          (timeInMin.days === "ALL-DAYS" ||
+            timeInMin.days.includes(day) ||
+            day.includes(timeInMin.days)) &&
+          timeInMin.startTime <= begTime &&
+          timeInMin.endTime >= begTime
+        ) {
           return true;
         }
       } catch (error) {
-        console.log(error)
+        // Do nothing
+        true
       }
-    })
-    return false;
+    }
+    return false; // Return false if no gap matches
   }
+  
 
   const planAdvising = () => {
     for (let c in courses) {
