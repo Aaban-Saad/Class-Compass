@@ -168,6 +168,7 @@ function Planner(props) {
 
     const gapTime = (gapDay + " " + gapFrom + " " + gapFromAm + " - " + gapTo + " " + gapToAm).toUpperCase()
     let timeInMinutes = timeToMinutes(gapTime)
+    if('error' in timeInMinutes) return
     if (timeInMinutes.startTime >= timeInMinutes.endTime) return
 
     if (gapTime !== "" && !gaps.includes(gapTime)) {
