@@ -237,10 +237,9 @@ function Planner(props) {
     day = day.toUpperCase()
     for (let c in courses) {
       let timeInMin = timeToMinutes(courses[c].time)
-      console.log("lol +. ", c,timeInMin, begTime)
+      console.log("lol +. ", c, timeInMin, begTime, day, day.includes(timeInMin.days))
       try {
-        if ((timeInMin.days).includes(day) && timeInMin.startTime <= begTime && timeInMin.endTime >= begTime) {
-          console.log("lol success")
+        if (((timeInMin.days).includes(day) || day.includes(timeInMin.days)) && timeInMin.startTime <= begTime && timeInMin.endTime >= begTime) {
           return true;
         }
       } catch (error) {
@@ -274,23 +273,29 @@ function Planner(props) {
           console.log(isTimeTaken(day, timeSlots[j]), isTimeGap(day, timeSlots[j]))
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
-            console.log(c, timeSlots[j], day.toUpperCase(), courseObj)
             if (!('course' in courseObj)) {
               continue
-            } else {
-              // setCourses((prev) => ({ ...prev, [c.toUpperCase()]: { taken: true, time: courseObj.time, sections: courseObj.sections } }))
-              courses[c].taken = true
-              courses[c].time = courseObj.time
-              courses[c].sections = courseObj.sections
-              break
+            }
+            else if ('course' in courseObj) {
+              console.log("updated ", courseObj)
+              day = timeToMinutes(courseObj.time).days // Updating day with the found day(s)
+              if (isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
+                // Second check with the updated day(s)
+                continue
+              }
+              else {
+                // setCourses((prev) => ({ ...prev, [c.toUpperCase()]: { taken: true, time: courseObj.time, sections: courseObj.sections } }))
+                courses[c].taken = true
+                courses[c].time = courseObj.time
+                courses[c].sections = courseObj.sections
+                break
+              }
             }
           }
         }
       }
     }
-
     console.log(courses)
-
   }
 
 
