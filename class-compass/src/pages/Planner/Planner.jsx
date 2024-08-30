@@ -281,6 +281,7 @@ function Planner(props) {
     // Resetting previous advising
     for (let c in courses) {
       courses[c].taken = false
+      courses[c].time = "none"
     }
     for (let c in classesInADay) {
       classesInADay[c] = 0
@@ -320,6 +321,8 @@ function Planner(props) {
         }
 
         let day = days[i].toUpperCase()
+
+        let keptLongGap = false
         for (let j = 0; j < timeSlots.length; j++) { // >>> For each time slot... Advise <<<
           // If max classes reached then break
           console.log(classesInADay[days[i].toUpperCase()], maxClassesPerDay)
@@ -330,6 +333,20 @@ function Planner(props) {
           // If maxed back to back classes then move to next slot
           if(bToBClasses >= maxBtoBClasses) {
             bToBClasses = 0 // Reset and move to next slot
+            continue
+          }
+
+          // Keeping long gap: if half or, more classes are taken already then skip a few slots
+          console.log(keepLongGaps, avoidLongGaps, classesInADay[day], maxClassesPerDay)
+          if(!keptLongGap && keepLongGaps && classesInADay[day] === Math.floor(maxClassesPerDay / 2)) {
+            j += 2
+            console.log("1____________",classesInADay[day] , Math.floor(Object.keys(courses).length / 2))
+            keptLongGap = true
+            continue
+          } else if(!keptLongGap && keepLongGaps && classesInADay[day] === Math.floor(Object.keys(courses).length / 2)) {
+            j += 2
+            console.log("2____________",classesInADay[day] , Math.floor(Object.keys(courses).length / 2))
+            keptLongGap = true
             continue
           }
 
@@ -585,7 +602,13 @@ function Planner(props) {
                         Try to avoid long gaps:
                       </Flex>
 
-                      <Checkbox onClick={() => setAvoidLongGaps(!avoidLongGaps)} />
+                      <Checkbox id="avoid-long-gap" onClick={() => setAvoidLongGaps((prev) => {
+                        const current = !prev
+                        if(keepLongGaps) {
+                          document.getElementById('keep-long-gap').click()
+                        }
+                        return current
+                        })} />
                     </Flex>
                   </Card>
 
@@ -598,7 +621,14 @@ function Planner(props) {
                         Try to keep long gaps:
                       </Flex>
 
-                      <Checkbox onClick={() => setKeepLongGaps(!keepLongGaps)} />
+                      <Checkbox id="keep-long-gap" onClick={() => setKeepLongGaps((prev) => {
+                        const current = !prev
+                        if(avoidLongGaps) {
+                          document.getElementById('avoid-long-gap').click()
+                        }
+                        return current
+                        })} 
+                      />
                     </Flex>
                   </Card>
 
