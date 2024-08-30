@@ -350,6 +350,11 @@ function Planner(props) {
             continue
           }
 
+          // Avoid prayer time: 12:15 - 1:30 and after 4:20
+          if(timeSlots[j] === 735 || timeSlots[j] >= 990) {
+            continue
+          }
+
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
             if (!('course' in courseObj)) {
