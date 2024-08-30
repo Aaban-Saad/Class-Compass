@@ -29,10 +29,10 @@ function Planner(props) {
   const [keepLongGaps, setKeepLongGaps] = useState(false)
   const [avoidPrayerTimes, setAvoidPrayerTimes] = useState(true)
 
-  const [coursesInADay, setCoursesInADay] = useState({ 's': 0, 't': 0, 'm': 0, 'w': 0, 'r': 0, 'a': 0, 'f': 0, })
   const [totalDaysTaken, setTotalDaysTaken] = useState(0)
 
-  const days = ['s', 't', 'm', 'w', 'r', 'a', 'f']
+  let classesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
+  const days = ['S', 'T', 'M', 'W', 'R', 'A', 'F']
   const timeSlots = [480, 565, 650, 735, 820, 905, 990, 1075, 1160, 1245, 1330] // In minutes
 
   useEffect(() => {
@@ -168,7 +168,7 @@ function Planner(props) {
 
     const gapTime = (gapDay + " " + gapFrom + " " + gapFromAm + " - " + gapTo + " " + gapToAm).toUpperCase()
     let timeInMinutes = timeToMinutes(gapTime)
-    if('error' in timeInMinutes) return
+    if ('error' in timeInMinutes) return
     if (timeInMinutes.startTime >= timeInMinutes.endTime) return
 
     if (gapTime !== "" && !gaps.includes(gapTime)) {
@@ -240,9 +240,9 @@ function Planner(props) {
       let timeInMin = timeToMinutes(courses[c].time)
       try {
         if (((timeInMin.days).includes(day) ||
-              day.includes(timeInMin.days)) &&
-            timeInMin.startTime <= begTime &&
-            timeInMin.endTime >= begTime) {
+          day.includes(timeInMin.days)) &&
+          timeInMin.startTime <= begTime &&
+          timeInMin.endTime >= begTime) {
           return true
         }
       } catch (error) {
@@ -274,43 +274,56 @@ function Planner(props) {
     }
     return false; // Return false if no gap matches
   }
-  
+
 
   const planAdvising = () => {
     // Resetting previous advising
     for (let c in courses) {
       courses[c].taken = false
     }
+    for (let c in classesInADay) {
+      classesInADay[c] = 0
+    }
 
     for (let c in courses) { // >>> For each course... <<<
       console.log("oh my course -> ", c)
+
       for (let i = 0; i < days.length; i++) { // >>> For each day... <<<
         if (courses[c].taken) break
 
+        if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
+          continue
+        }
+
         // Filtering possible class days
-        if((days[i].toUpperCase() === 'S' ||
-             days[i].toUpperCase() === 'T') &&
-            !stPossible) {
-              continue
+        if ((days[i].toUpperCase() === 'S' ||
+          days[i].toUpperCase() === 'T') &&
+          !stPossible) {
+          continue
         }
-        else if((days[i].toUpperCase() === 'M' ||
-             days[i].toUpperCase() === 'W') &&
-            !mwPossible) {
-              continue
+        else if ((days[i].toUpperCase() === 'M' ||
+          days[i].toUpperCase() === 'W') &&
+          !mwPossible) {
+          continue
         }
-        else if((days[i].toUpperCase() === 'R' ||
-             days[i].toUpperCase() === 'A') &&
-            !raPossible) {
-              continue
+        else if ((days[i].toUpperCase() === 'R' ||
+          days[i].toUpperCase() === 'A') &&
+          !raPossible) {
+          continue
         }
-        else if(days[i].toUpperCase() === 'F' &&
-            !fPossible) {
-              continue
+        else if (days[i].toUpperCase() === 'F' &&
+          !fPossible) {
+          continue
         }
 
         let day = days[i].toUpperCase()
         for (let j = 0; j < timeSlots.length; j++) { // >>> For each time slot... Advise <<<
-          console.log(isTimeTaken(day, timeSlots[j]), isTimeGap(day, timeSlots[j]))
+          // If max classes reached then break
+          console.log(classesInADay[days[i].toUpperCase()], maxClassesPerDay)
+          if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
+            break
+          }
+
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
             if (!('course' in courseObj)) {
@@ -324,10 +337,17 @@ function Planner(props) {
                 continue
               }
               else {
+
                 // setCourses((prev) => ({ ...prev, [c.toUpperCase()]: { taken: true, time: courseObj.time, sections: courseObj.sections } }))
                 courses[c].taken = true
                 courses[c].time = courseObj.time
                 courses[c].sections = courseObj.sections
+
+                // Keeping track of the number of classes per day
+                classesInADay[day.charAt(0)]++
+                if(day.length > 1) classesInADay[day.charAt(1)]++
+                console.log(classesInADay)
+
                 break
               }
             }
