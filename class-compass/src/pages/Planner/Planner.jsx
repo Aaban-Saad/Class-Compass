@@ -31,6 +31,7 @@ function Planner(props) {
 
   const [totalDaysTaken, setTotalDaysTaken] = useState(0)
 
+  let bToBClasses = 0
   let classesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
   const days = ['S', 'T', 'M', 'W', 'R', 'A', 'F']
   const timeSlots = [480, 565, 650, 735, 820, 905, 990, 1075, 1160, 1245, 1330] // In minutes
@@ -284,12 +285,14 @@ function Planner(props) {
     for (let c in classesInADay) {
       classesInADay[c] = 0
     }
+    bToBClasses = 0
 
     for (let c in courses) { // >>> For each course... <<<
-      console.log("oh my course -> ", c)
 
       for (let i = 0; i < days.length; i++) { // >>> For each day... <<<
         if (courses[c].taken) break
+
+        bToBClasses = 0
 
         if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
           continue
@@ -324,9 +327,16 @@ function Planner(props) {
             break
           }
 
+          // If maxed back to back classes then move to next slot
+          if(bToBClasses >= maxBtoBClasses) {
+            bToBClasses = 0 // Reset and move to next slot
+            continue
+          }
+
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
             if (!('course' in courseObj)) {
+              bToBClasses = 0 // Reset back to back classes
               continue
             }
             else if ('course' in courseObj) {
@@ -334,6 +344,7 @@ function Planner(props) {
               day = timeToMinutes(courseObj.time).days // Updating day with the found day(s)
               if (isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
                 // Second check with the updated day(s)
+                bToBClasses = 0 // Reset back to back classes
                 continue
               }
               else {
@@ -343,6 +354,8 @@ function Planner(props) {
                 courses[c].time = courseObj.time
                 courses[c].sections = courseObj.sections
 
+                // Increase back to back classes
+                bToBClasses++
                 // Keeping track of the number of classes per day
                 classesInADay[day.charAt(0)]++
                 if(day.length > 1) classesInADay[day.charAt(1)]++
