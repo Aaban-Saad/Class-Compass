@@ -31,8 +31,8 @@ function Planner(props) {
 
   const [totalDaysTaken, setTotalDaysTaken] = useState(0)
 
-  let bToBClasses = 0
   let classesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
+  let BtoBClassesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
   const days = ['S', 'T', 'M', 'W', 'R', 'A', 'F']
   const timeSlots = [480, 565, 650, 735, 820, 905, 990, 1075, 1160, 1245, 1330] // In minutes
 
@@ -143,6 +143,8 @@ function Planner(props) {
   }
 
   function findCourseBySubstring(searchString) {
+    if (searchString.length < 2) return
+
     searchString = searchString.toLowerCase();
 
     for (const day in dayCombinations) {
@@ -158,6 +160,8 @@ function Planner(props) {
 
 
   const addCourse = (course) => {
+    if (course.length < 2) return
+
     let c = findCourseBySubstring(course)
     if (c !== "" && !courses.hasOwnProperty(c)) {
       setCourses((prev) => ({ ...prev, [c.toUpperCase()]: { taken: false, time: "none", sections: [] } }))
@@ -253,6 +257,33 @@ function Planner(props) {
     }
   }
 
+  function getSectionWithHighestSeats(sections) {
+    if (!Array.isArray(sections) || sections.length === 0) {
+      return {} // Return empty obj
+    }
+
+    // Use reduce to find the section with the highest available seats
+    return sections.reduce((maxSection, currentSection) => {
+      return currentSection.availableSeats > maxSection.availableSeats ? currentSection : maxSection
+    })
+  }
+
+  function getCourseTiming(courseName, sectionName) {
+    for (const day in dayCombinations) {
+      const courses = dayCombinations[day]
+      for (const courseObj of courses) {
+        if (courseObj.course === courseName) {
+          for (const sectionObj of courseObj.sections) {
+            if (sectionObj.section === sectionName) {
+              return courseObj.time; // Return the time if course and section match
+            }
+          }
+        }
+      }
+    }
+    return ""
+  }
+
   function isTimeTaken(day, time) {
     day = day.toUpperCase()
     for (let c in courses) {
@@ -293,24 +324,40 @@ function Planner(props) {
     return false; // Return false if no gap matches
   }
 
+  function getBtoBClasses(day, time) {
+    let n = 0
+    let i = timeSlots.indexOf(time)
+
+    for(i; i >= 0; i--) {
+      if(isTimeTaken(day, time)) n++
+      else break
+    }
+
+    i = timeSlots.indexOf(time)
+    for(i; i < timeSlots.length; i++) {
+      if(isTimeTaken(day, time)) n++
+      else break
+    }
+    return n
+  }
 
   const planAdvising = () => {
     // Resetting previous advising
     for (let c in courses) {
       courses[c].taken = false
       courses[c].time = "none"
+      courses[c].sections = []
     }
     for (let c in classesInADay) {
       classesInADay[c] = 0
+      BtoBClassesInADay[c] = 0
     }
-    bToBClasses = 0
 
     for (let c in courses) { // >>> For each course... <<<
 
       for (let i = 0; i < days.length; i++) { // >>> For each day... <<<
         if (courses[c].taken) break
 
-        bToBClasses = 0
 
         if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
           continue
@@ -348,8 +395,13 @@ function Planner(props) {
           }
 
           // If maxed back to back classes then move to next slot
-          if (bToBClasses >= maxBtoBClasses) {
-            bToBClasses = 0 // Reset and move to next slot
+          if (BtoBClassesInADay[day.charAt(0)] >= maxBtoBClasses) {
+            j++
+            // Resetting b to b classes
+            BtoBClassesInADay[day.charAt(0)] = 0
+            if (day.length > 1) {
+              BtoBClassesInADay[day.charAt(1)] = 0
+            }
             continue
           }
 
@@ -359,23 +411,42 @@ function Planner(props) {
             j += 2
             console.log("1____________", classesInADay[day], Math.floor(Object.keys(courses).length / 2))
             keptLongGap = true
+            // Resetting b to b classes
+            BtoBClassesInADay[day.charAt(0)] = 0
+            if (day.length > 1) {
+              BtoBClassesInADay[day.charAt(1)] = 0
+            }
             continue
           } else if (!keptLongGap && keepLongGaps && classesInADay[day] === Math.floor(Object.keys(courses).length / 2)) {
             j += 2
             console.log("2____________", classesInADay[day], Math.floor(Object.keys(courses).length / 2))
             keptLongGap = true
+            // Resetting b to b classes
+            BtoBClassesInADay[day.charAt(0)] = 0
+            if (day.length > 1) {
+              BtoBClassesInADay[day.charAt(1)] = 0
+            }
             continue
           }
 
           // Avoid prayer time: 12:15 - 1:30 and after 4:20
-          if (timeSlots[j] === 735 || timeSlots[j] >= 990) {
+          if (avoidPrayerTimes && timeSlots[j] === 735 || timeSlots[j] >= 990) {
+            // Resetting b to b classes
+            BtoBClassesInADay[day.charAt(0)] = 0
+            if (day.length > 1) {
+              BtoBClassesInADay[day.charAt(1)] = 0
+            }
             continue
           }
 
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
             if (!('course' in courseObj)) {
-              bToBClasses = 0 // Reset back to back classes
+              // Resetting b to b classes
+              BtoBClassesInADay[day.charAt(0)] = 0
+              if (day.length > 1) {
+                BtoBClassesInADay[day.charAt(1)] = 0
+              }
               continue
             }
             else if ('course' in courseObj) {
@@ -385,27 +456,98 @@ function Planner(props) {
               let endTime = timeInMin.endTime
               if (isTimeTaken(day, timeSlots[j]) || isTimeGap(day, timeSlots[j])) {
                 // Second check with the updated day(s)
-                bToBClasses = 0 // Reset back to back classes
+                // Resetting b to b classes
+                BtoBClassesInADay[day.charAt(0)] = 0
+                if (day.length > 1) {
+                  BtoBClassesInADay[day.charAt(1)] = 0
+                }
                 continue
               }
-              else if(isTimeTaken(day, endTime) || isTimeGap(day, endTime)) {
+              else if (isTimeTaken(day, endTime) || isTimeGap(day, endTime)) {
                 // Second check if the end time is available
-                bToBClasses = 0 // Reset back to back classes
+                // Resetting b to b classes
+                BtoBClassesInADay[day.charAt(0)] = 0
+                if (day.length > 1) {
+                  BtoBClassesInADay[day.charAt(1)] = 0
+                }
                 continue
               }
               else {
+                // Check for ECE people (Same section lab)
+                if ((c.includes("CSE") || c.includes("EEE") || c.includes("ETE") || c.includes("ECE")) && c.charAt(c.length - 1) !== "L") {
+                  let labCourseName = ""
+                  let differentNames = c.split("/")
+                  differentNames.forEach(course => {
+                    labCourseName += course + "L" + "/"
+                  });
+                  labCourseName = labCourseName.substring(0, labCourseName.length - 1)// avoid the last "/"
 
-                // setCourses((prev) => ({ ...prev, [c.toUpperCase()]: { taken: true, time: courseObj.time, sections: courseObj.sections } }))
+                  console.log(labCourseName)
+                  if (labCourseName in courses) {
+                    let preferredSection = getSectionWithHighestSeats(courseObj.sections)
+                    let labTimingString = getCourseTiming(labCourseName, preferredSection.section)
+                    let labTiming = timeToMinutes(labTimingString)
+                    if (isTimeTaken(labTiming.days, labTiming.startTime) ||
+                      isTimeGap(labTiming.days, labTiming.startTime) ||
+                      isTimeTaken(labTiming.days, labTiming.endTime) ||
+                      isTimeGap(labTiming.days, labTiming.endTime)) {
+
+                      // Just in case..if these was taken before, drop it, cz, time clashes
+                      courses[c].taken = false
+                      courses[c].time = "none"
+                      courses[c].sections = []
+  
+                      courses[labCourseName].taken = false
+                      courses[labCourseName].time = "none"
+                      courses[labCourseName].sections = []
+
+                      // Resetting b to b classes
+                      BtoBClassesInADay[day.charAt(0)] = 0
+                      if (day.length > 1) {
+                        BtoBClassesInADay[day.charAt(1)] = 0
+                      }
+                      continue
+                    }
+                    else {
+                      // Paired section with lab
+                      courses[c].taken = true
+                      courses[c].time = courseObj.time
+                      courses[c].sections = [preferredSection]
+  
+                      courses[labCourseName].taken = true
+                      courses[labCourseName].time = labTimingString
+                      courses[labCourseName].sections = [preferredSection]
+  
+                      // Keeping track of the number of classes per day
+                      classesInADay[day.charAt(0)]++
+                      classesInADay[labTiming.days.charAt(0)]++
+                      BtoBClassesInADay[day.charAt(0)] += getBtoBClasses(day.charAt(0), courseObj.time)
+                      if (day.length > 1) {
+                        classesInADay[day.charAt(1)]++
+                        classesInADay[labTiming.days.charAt(1)]++
+                        BtoBClassesInADay[day.charAt(1)] += getBtoBClasses(day.charAt(1), courseObj.time)
+                      }
+                      console.log("classes => ", day, classesInADay)
+  
+                      break
+                    }
+                  }
+                }
                 courses[c].taken = true
                 courses[c].time = courseObj.time
                 courses[c].sections = courseObj.sections
 
                 // Increase back to back classes
-                bToBClasses++
+                console.log(isTimeTaken(day, timeSlots[j + 1]), isTimeTaken(day, timeSlots[j - 1]), "b to b increased")
                 // Keeping track of the number of classes per day
                 classesInADay[day.charAt(0)]++
-                if (day.length > 1) classesInADay[day.charAt(1)]++
-                console.log(classesInADay)
+                BtoBClassesInADay[day.charAt(0)] += getBtoBClasses(day.charAt(0), courseObj.time)
+                if (day.length > 1) {
+                  classesInADay[day.charAt(1)]++
+                  BtoBClassesInADay[day.charAt(1)] += getBtoBClasses(day.charAt(1), courseObj.time)
+                }
+                console.log("classes => ",c , day, classesInADay, BtoBClassesInADay)
+                console.log("avoid prayer time ", avoidPrayerTimes)
 
                 break
               }
@@ -447,7 +589,7 @@ function Planner(props) {
 
                       {Object.keys(courses).map((courseKey) => {
                         return (
-                          <Card key={courseKey} variant='classic' style={{backgroundColor:"var(--indigo-2)", border:"2px solid var(--indigo-7)"}}>
+                          <Card key={courseKey} variant='classic' style={{ backgroundColor: "var(--indigo-2)", border: "2px solid var(--indigo-7)" }}>
                             <Flex justify="center" align="center" gap="3" color="red" >
                               <Text size="2" color='indigo' style={{ maxWidth: "70px" }}>
                                 {courseKey}
@@ -521,7 +663,7 @@ function Planner(props) {
                   </Heading>
 
                   <Flex direction="column">
-                    <Flex justify="center" align="center" gap="1">
+                    <Flex justify="center" align="center" gap="1" mb="2">
                       <IconButton variant='soft'>
                         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM1.82707 7.49972C1.82707 4.36671 4.36689 1.82689 7.49991 1.82689C10.6329 1.82689 13.1727 4.36671 13.1727 7.49972C13.1727 10.6327 10.6329 13.1726 7.49991 13.1726C4.36689 13.1726 1.82707 10.6327 1.82707 7.49972ZM8.24992 4.49999C8.24992 4.9142 7.91413 5.24999 7.49992 5.24999C7.08571 5.24999 6.74992 4.9142 6.74992 4.49999C6.74992 4.08577 7.08571 3.74999 7.49992 3.74999C7.91413 3.74999 8.24992 4.08577 8.24992 4.49999ZM6.00003 5.99999H6.50003H7.50003C7.77618 5.99999 8.00003 6.22384 8.00003 6.49999V9.99999H8.50003H9.00003V11H8.50003H7.50003H6.50003H6.00003V9.99999H6.50003H7.00003V6.99999H6.50003H6.00003V5.99999Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       </IconButton>
