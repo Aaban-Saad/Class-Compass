@@ -1,7 +1,6 @@
-import { Heading, Text, Card, Flex, TextField, Button, Badge, Grid, Select, Checkbox, CheckboxCards, IconButton } from '@radix-ui/themes'
+import { Popover, Heading, Table, Text, Card, Flex, TextField, Button, Badge, Grid, Select, Checkbox, CheckboxCards, IconButton } from '@radix-ui/themes'
 import Navbar from '../../components/Navbar/Navbar'
 import { useEffect, useState } from 'react'
-import { paddingPropDefs } from '@radix-ui/themes/dist/cjs/props/padding.props'
 
 function Planner(props) {
   const [data, setData] = useState(null)
@@ -29,7 +28,7 @@ function Planner(props) {
   const [keepLongGaps, setKeepLongGaps] = useState(false)
   const [avoidPrayerTimes, setAvoidPrayerTimes] = useState(true)
 
-  const [totalDaysTaken, setTotalDaysTaken] = useState(0)
+  const [finishedPlanning, setFinishedPlanning] = useState(false)
 
   let classesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
   let BtoBClassesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
@@ -66,6 +65,7 @@ function Planner(props) {
 
 
   useEffect(() => {
+    setFinishedPlanning(() => false)
     if (keyPressed === "Enter") {
       addCourse(course)
     }
@@ -328,25 +328,44 @@ function Planner(props) {
     let n = 0
     let i = timeSlots.indexOf(time)
 
-    for(i; i >= 0; i--) {
-      if(isTimeTaken(day, time)) n++
+    for (i; i >= 0; i--) {
+      if (isTimeTaken(day, timeSlots[i])) n++
       else break
     }
 
-    i = timeSlots.indexOf(time)
-    for(i; i < timeSlots.length; i++) {
-      if(isTimeTaken(day, time)) n++
+    i = timeSlots.indexOf(time) + 1
+    for (i; i < timeSlots.length; i++) {
+      if (isTimeTaken(day, timeSlots[i])) n++
       else break
     }
     return n
   }
 
+  const updateCourse = (c, taken, timeString, sections) => {
+    // Create a new copy of the courses state
+    const updatedCourses = { ...courses };
+
+    // Update the specific course
+    updatedCourses[c] = {
+      ...updatedCourses[c], // Preserve other properties if any
+      taken: taken,
+      time: timeString,
+      sections: sections,
+    };
+
+    // Set the new state
+    setCourses(updatedCourses);
+  };
+
   const planAdvising = () => {
+    setFinishedPlanning(() => false)
+
     // Resetting previous advising
     for (let c in courses) {
       courses[c].taken = false
-      courses[c].time = "none"
+      courses[c].time = "Couldn't manage time"
       courses[c].sections = []
+      updateCourse(c, false, "Couldn't manage time", [])
     }
     for (let c in classesInADay) {
       classesInADay[c] = 0
@@ -354,10 +373,12 @@ function Planner(props) {
     }
 
     for (let c in courses) { // >>> For each course... <<<
+      if (courses[c].taken) continue
+      console.log("________course ", c)
 
       for (let i = 0; i < days.length; i++) { // >>> For each day... <<<
+        console.log("_____________day ", days[i])
         if (courses[c].taken) break
-
 
         if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
           continue
@@ -388,6 +409,8 @@ function Planner(props) {
 
         let keptLongGap = false
         for (let j = 0; j < timeSlots.length; j++) { // >>> For each time slot... Advise <<<
+          console.log("_____________time ", timeSlots[j])
+
           // If max classes reached then break
           console.log(classesInADay[days[i].toUpperCase()], maxClassesPerDay)
           if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
@@ -395,13 +418,12 @@ function Planner(props) {
           }
 
           // If maxed back to back classes then move to next slot
-          if (BtoBClassesInADay[day.charAt(0)] >= maxBtoBClasses) {
-            j++
-            // Resetting b to b classes
-            BtoBClassesInADay[day.charAt(0)] = 0
-            if (day.length > 1) {
-              BtoBClassesInADay[day.charAt(1)] = 0
-            }
+          // if (BtoBClassesInADay[day.charAt(0)] >= maxBtoBClasses) {
+          //   console.log("b to b maxed move to next slot")
+          //   continue
+          // }
+          if (getBtoBClasses(days[i], timeSlots[j]) + 1 >= maxBtoBClasses) { // + 1 to count the current time
+            console.log("b to b maxed move to next slot")
             continue
           }
 
@@ -411,42 +433,22 @@ function Planner(props) {
             j += 2
             console.log("1____________", classesInADay[day], Math.floor(Object.keys(courses).length / 2))
             keptLongGap = true
-            // Resetting b to b classes
-            BtoBClassesInADay[day.charAt(0)] = 0
-            if (day.length > 1) {
-              BtoBClassesInADay[day.charAt(1)] = 0
-            }
             continue
           } else if (!keptLongGap && keepLongGaps && classesInADay[day] === Math.floor(Object.keys(courses).length / 2)) {
             j += 2
             console.log("2____________", classesInADay[day], Math.floor(Object.keys(courses).length / 2))
             keptLongGap = true
-            // Resetting b to b classes
-            BtoBClassesInADay[day.charAt(0)] = 0
-            if (day.length > 1) {
-              BtoBClassesInADay[day.charAt(1)] = 0
-            }
             continue
           }
 
           // Avoid prayer time: 12:15 - 1:30 and after 4:20
           if (avoidPrayerTimes && timeSlots[j] === 735 || timeSlots[j] >= 990) {
-            // Resetting b to b classes
-            BtoBClassesInADay[day.charAt(0)] = 0
-            if (day.length > 1) {
-              BtoBClassesInADay[day.charAt(1)] = 0
-            }
             continue
           }
 
           if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
             let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
             if (!('course' in courseObj)) {
-              // Resetting b to b classes
-              BtoBClassesInADay[day.charAt(0)] = 0
-              if (day.length > 1) {
-                BtoBClassesInADay[day.charAt(1)] = 0
-              }
               continue
             }
             else if ('course' in courseObj) {
@@ -456,16 +458,10 @@ function Planner(props) {
               let endTime = timeInMin.endTime
               if (isTimeTaken(day, timeSlots[j]) || isTimeGap(day, timeSlots[j])) {
                 // Second check with the updated day(s)
-                // Resetting b to b classes
-                BtoBClassesInADay[day.charAt(0)] = 0
-                if (day.length > 1) {
-                  BtoBClassesInADay[day.charAt(1)] = 0
-                }
                 continue
               }
               else if (isTimeTaken(day, endTime) || isTimeGap(day, endTime)) {
                 // Second check if the end time is available
-                // Resetting b to b classes
                 BtoBClassesInADay[day.charAt(0)] = 0
                 if (day.length > 1) {
                   BtoBClassesInADay[day.charAt(1)] = 0
@@ -482,71 +478,68 @@ function Planner(props) {
                   });
                   labCourseName = labCourseName.substring(0, labCourseName.length - 1)// avoid the last "/"
 
-                  console.log(labCourseName)
+                  console.log(labCourseName, (labCourseName in courses))
                   if (labCourseName in courses) {
                     let preferredSection = getSectionWithHighestSeats(courseObj.sections)
                     let labTimingString = getCourseTiming(labCourseName, preferredSection.section)
                     let labTiming = timeToMinutes(labTimingString)
-                    if (isTimeTaken(labTiming.days, labTiming.startTime) ||
+
+                    console.log("Lab  ", preferredSection, labTiming)
+                    // If taken before, drop it first
+                    updateCourse(labCourseName, false, "Time clashes", [])
+                    courses[labCourseName].taken = false
+                    courses[labCourseName].time = "Time clashes"
+                    courses[labCourseName].sections = []
+
+                    if (!(isTimeTaken(labTiming.days, labTiming.startTime) ||
                       isTimeGap(labTiming.days, labTiming.startTime) ||
                       isTimeTaken(labTiming.days, labTiming.endTime) ||
-                      isTimeGap(labTiming.days, labTiming.endTime)) {
+                      isTimeGap(labTiming.days, labTiming.endTime))) {
 
-                      // Just in case..if these was taken before, drop it, cz, time clashes
-                      courses[c].taken = false
-                      courses[c].time = "none"
-                      courses[c].sections = []
-  
-                      courses[labCourseName].taken = false
-                      courses[labCourseName].time = "none"
-                      courses[labCourseName].sections = []
-
-                      // Resetting b to b classes
-                      BtoBClassesInADay[day.charAt(0)] = 0
-                      if (day.length > 1) {
-                        BtoBClassesInADay[day.charAt(1)] = 0
-                      }
-                      continue
-                    }
-                    else {
                       // Paired section with lab
+                      updateCourse(c, true, courseObj.time, [preferredSection])
                       courses[c].taken = true
                       courses[c].time = courseObj.time
                       courses[c].sections = [preferredSection]
-  
+
+                      updateCourse(labCourseName, true, labTimingString, [preferredSection])
                       courses[labCourseName].taken = true
                       courses[labCourseName].time = labTimingString
                       courses[labCourseName].sections = [preferredSection]
-  
+
                       // Keeping track of the number of classes per day
                       classesInADay[day.charAt(0)]++
                       classesInADay[labTiming.days.charAt(0)]++
-                      BtoBClassesInADay[day.charAt(0)] += getBtoBClasses(day.charAt(0), courseObj.time)
+                      BtoBClassesInADay[day.charAt(0)] = getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime)
                       if (day.length > 1) {
                         classesInADay[day.charAt(1)]++
                         classesInADay[labTiming.days.charAt(1)]++
-                        BtoBClassesInADay[day.charAt(1)] += getBtoBClasses(day.charAt(1), courseObj.time)
+                        BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
                       }
                       console.log("classes => ", day, classesInADay)
-  
+
                       break
                     }
+                    continue
                   }
                 }
+
+                updateCourse(c, true, courseObj.time, courseObj.sections)
                 courses[c].taken = true
                 courses[c].time = courseObj.time
                 courses[c].sections = courseObj.sections
 
                 // Increase back to back classes
-                console.log(isTimeTaken(day, timeSlots[j + 1]), isTimeTaken(day, timeSlots[j - 1]), "b to b increased")
+
                 // Keeping track of the number of classes per day
                 classesInADay[day.charAt(0)]++
-                BtoBClassesInADay[day.charAt(0)] += getBtoBClasses(day.charAt(0), courseObj.time)
+                BtoBClassesInADay[day.charAt(0)] = getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime)
                 if (day.length > 1) {
                   classesInADay[day.charAt(1)]++
-                  BtoBClassesInADay[day.charAt(1)] += getBtoBClasses(day.charAt(1), courseObj.time)
+                  BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
                 }
-                console.log("classes => ",c , day, classesInADay, BtoBClassesInADay)
+                console.log("classes => ", c, day, classesInADay, BtoBClassesInADay, getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime))
+                console.log("max b to b => ", maxBtoBClasses)
                 console.log("avoid prayer time ", avoidPrayerTimes)
 
                 break
@@ -557,6 +550,7 @@ function Planner(props) {
       }
     }
     console.log(courses)
+    setFinishedPlanning(() => true)
   }
 
 
@@ -801,7 +795,56 @@ function Planner(props) {
 
         <Card>
           <Flex>
+            {
+              finishedPlanning ?
+                (
+                  <>
+                    <Flex direction="column" justify="center" align="center" gap="2">
+                      <Heading>Advising Plan</Heading>
+                      <Table.Root variant="surface">
+                        <Table.Header>
+                          <Table.Row>
+                            <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
+                            <Table.ColumnHeaderCell>Time</Table.ColumnHeaderCell>
+                            <Table.ColumnHeaderCell>Sections</Table.ColumnHeaderCell>
+                          </Table.Row>
+                        </Table.Header>
 
+                        <Table.Body>
+                          {
+                            Object.keys(courses).map((courseKey) => (
+                              <Table.Row key={courseKey}>
+                                <Table.Cell>{courseKey}</Table.Cell>
+                                <Table.Cell>{courses[courseKey].time}</Table.Cell>
+                                <Table.Cell>
+                                  <Grid columns={{ initial: "2", md: "3", lg: "3" }} gap="1" width="auto">
+                                    {courses[courseKey].sections.map((section, index) => {
+                                      return (
+                                        <Popover.Root key={index}>
+                                          <Popover.Trigger>
+                                            <Button variant="soft">{section.section}</Button>
+                                          </Popover.Trigger>
+                                          <Popover.Content size="1" maxWidth="300px">
+                                            <Text as="p" trim="both" size="1">
+                                              Section: {section.section} | Available Seats: {section.availableSeats} | Faculty: {section.faculty}
+                                            </Text>
+                                          </Popover.Content>
+                                        </Popover.Root>
+                                      )
+                                    })}
+                                  </Grid>
+                                </Table.Cell>
+                              </Table.Row>
+                            ))
+                          }
+
+                        </Table.Body>
+                      </Table.Root>
+                    </Flex>
+                  </>
+
+                ) : true
+            }
           </Flex>
         </Card>
       </Flex>

@@ -12,7 +12,9 @@ export default async function handler(req, res) {
 
   try {
     // const response = await fetch('https://rds2.northsouth.edu/index.php/common/showofferedcourses'); // Replace with the desired URL
-    const response = await fetch('http://0.0.0.0:8000/'); // for testing
+    // const response = await fetch('http://0.0.0.0:8000/');
+    const response = await fetch('https://aaban-saad.github.io/NSU-Offered-Course-List-Sample/');
+    
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
