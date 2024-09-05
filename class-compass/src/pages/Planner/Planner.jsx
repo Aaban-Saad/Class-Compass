@@ -31,7 +31,7 @@ function Planner(props) {
   const [finishedPlanning, setFinishedPlanning] = useState(false)
 
   let classesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
-  let BtoBClassesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
+  let btoBClassesInADay = { 'S': 0, 'T': 0, 'M': 0, 'W': 0, 'R': 0, 'A': 0, 'F': 0, }
   const days = ['S', 'T', 'M', 'W', 'R', 'A', 'F']
   const timeSlots = [480, 565, 650, 735, 820, 905, 990, 1075, 1160, 1245, 1330] // In minutes
 
@@ -326,18 +326,21 @@ function Planner(props) {
 
   function getBtoBClasses(day, time) {
     let n = 0
-    let i = timeSlots.indexOf(time)
+    let i = timeSlots.indexOf(time) - 1
 
     for (i; i >= 0; i--) {
+      console.log("i , n", i, n)
       if (isTimeTaken(day, timeSlots[i])) n++
       else break
     }
 
     i = timeSlots.indexOf(time) + 1
     for (i; i < timeSlots.length; i++) {
+      console.log("i , n", i, n)
       if (isTimeTaken(day, timeSlots[i])) n++
       else break
     }
+    console.log("n = ", n)
     return n
   }
 
@@ -369,7 +372,6 @@ function Planner(props) {
     }
     for (let c in classesInADay) {
       classesInADay[c] = 0
-      BtoBClassesInADay[c] = 0
     }
 
     for (let c in courses) { // >>> For each course... <<<
@@ -417,15 +419,6 @@ function Planner(props) {
             break
           }
 
-          // If maxed back to back classes then move to next slot
-          // if (BtoBClassesInADay[day.charAt(0)] >= maxBtoBClasses) {
-          //   console.log("b to b maxed move to next slot")
-          //   continue
-          // }
-          if (getBtoBClasses(days[i], timeSlots[j]) + 1 >= maxBtoBClasses) { // + 1 to count the current time
-            console.log("b to b maxed move to next slot")
-            continue
-          }
 
           // Keeping long gap: if half or, more classes are taken already then skip a few slots
           console.log(keepLongGaps, avoidLongGaps, classesInADay[day], maxClassesPerDay)
@@ -462,13 +455,20 @@ function Planner(props) {
               }
               else if (isTimeTaken(day, endTime) || isTimeGap(day, endTime)) {
                 // Second check if the end time is available
-                BtoBClassesInADay[day.charAt(0)] = 0
-                if (day.length > 1) {
-                  BtoBClassesInADay[day.charAt(1)] = 0
-                }
                 continue
               }
               else {
+                // Checking max back to back classes
+                console.log("current course = ", c)
+                console.log("max b to b => ", maxBtoBClasses)
+                let lol = getBtoBClasses(day, timeSlots[j])
+                console.log("b to b lol = = " + lol)
+                if (getBtoBClasses(day, timeSlots[j]) >= maxBtoBClasses) { // + 1 to count the current time
+                  console.log("b to b maxed move to next slot")
+                  // j++
+                  continue
+                }
+
                 // Check for ECE people (Same section lab)
                 if ((c.includes("CSE") || c.includes("EEE") || c.includes("ETE") || c.includes("ECE")) && c.charAt(c.length - 1) !== "L") {
                   let labCourseName = ""
@@ -491,6 +491,11 @@ function Planner(props) {
                     courses[labCourseName].time = "Time clashes"
                     courses[labCourseName].sections = []
 
+                    // Avoid prayer time: 12:15 - 1:30 and after 4:20
+                    if (avoidPrayerTimes && labTiming.startTime === 735 || labTiming.startTime >= 990) {
+                      continue
+                    }
+
                     if (!(isTimeTaken(labTiming.days, labTiming.startTime) ||
                       isTimeGap(labTiming.days, labTiming.startTime) ||
                       isTimeTaken(labTiming.days, labTiming.endTime) ||
@@ -510,11 +515,11 @@ function Planner(props) {
                       // Keeping track of the number of classes per day
                       classesInADay[day.charAt(0)]++
                       classesInADay[labTiming.days.charAt(0)]++
-                      BtoBClassesInADay[day.charAt(0)] = getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime)
+                      // BtoBClassesInADay[day.charAt(0)] = getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime)
                       if (day.length > 1) {
                         classesInADay[day.charAt(1)]++
                         classesInADay[labTiming.days.charAt(1)]++
-                        BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
+                        // BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
                       }
                       console.log("classes => ", day, classesInADay)
 
@@ -533,14 +538,22 @@ function Planner(props) {
 
                 // Keeping track of the number of classes per day
                 classesInADay[day.charAt(0)]++
-                BtoBClassesInADay[day.charAt(0)] = getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime)
+                // BtoBClassesInADay[day.charAt(0)] = getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime)
                 if (day.length > 1) {
                   classesInADay[day.charAt(1)]++
-                  BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
+                  // BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
                 }
-                console.log("classes => ", c, day, classesInADay, BtoBClassesInADay, getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime))
-                console.log("max b to b => ", maxBtoBClasses)
+                console.log("classes => ", c, day, classesInADay, getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime))
                 console.log("avoid prayer time ", avoidPrayerTimes)
+
+                // Checking max back to back classes
+                console.log("current course = ", c)
+                console.log("max b to b => ", maxBtoBClasses)
+                console.log("b to b lol = = " + getBtoBClasses(day, timeSlots[j]))
+                if (getBtoBClasses(day, timeSlots[j]) >= maxBtoBClasses) {
+                  console.log("b to b maxed move to next slot")
+                  continue
+                }
 
                 break
               }

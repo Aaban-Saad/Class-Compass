@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 function App() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") ? localStorage.getItem("theme") : "dark")
+  const [theme, setTheme] = useState(localStorage.getItem("theme") ? localStorage.getItem("theme") : "light")
   const [bgTheme, setBgTheme] = useState("bg-dark")
   
   const router = createBrowserRouter([
