@@ -1,4 +1,4 @@
-import { Popover, Heading, Table, Text, Card, Flex, TextField, Button, Badge, Grid, Select, Checkbox, CheckboxCards, IconButton } from '@radix-ui/themes'
+import { Slider, Popover, Heading, Table, Text, Card, Flex, TextField, Button, Badge, Grid, Select, Checkbox, CheckboxCards, IconButton } from '@radix-ui/themes'
 import Navbar from '../../components/Navbar/Navbar'
 import { useEffect, useState, useRef } from 'react'
 import domtoimage from 'dom-to-image'
@@ -121,10 +121,8 @@ function Planner(props) {
       }
     });
     setDayCombinations(dayCombinations)
-    console.log(dayCombinations)
 
     const sections = findSections(dayCombinations, "CSE225", "480", "S");
-    console.log(sections);
   };
 
   const captureRef = useRef(null);
@@ -146,10 +144,8 @@ function Planner(props) {
   const findSections = (schedule, course, begTime, days) => {
     for (const day in schedule) {
       const dayCourses = schedule[day]
-      // console.log(dayCourses)
       for (const courseObj of dayCourses) {
         let courseTimeInMin = timeToMinutes(courseObj.time)
-        // console.log(courseObj.course, begTime, courseTimeInMin.startTime, courseTimeInMin.days, days)
         if (courseObj.course === course && begTime == courseTimeInMin.startTime && (courseTimeInMin.days).includes(days)) {
           return courseObj
         }
@@ -185,6 +181,9 @@ function Planner(props) {
       setCourse(() => "")
       document.getElementById("planner-course-input").value = ""
     }
+
+    setFinishedPlanning(() => false)
+
   }
 
 
@@ -194,6 +193,8 @@ function Planner(props) {
       delete newCourses[courseToRemove]
       return newCourses
     })
+
+    setFinishedPlanning(() => false)
   }
 
 
@@ -346,18 +347,15 @@ function Planner(props) {
     let i = timeSlots.indexOf(time) - 1
 
     for (i; i >= 0; i--) {
-      console.log("i , n", i, n)
       if (isTimeTaken(day, timeSlots[i])) n++
       else break
     }
 
     i = timeSlots.indexOf(time) + 1
     for (i; i < timeSlots.length; i++) {
-      console.log("i , n", i, n)
       if (isTimeTaken(day, timeSlots[i])) n++
       else break
     }
-    console.log("n = ", n)
     return n
   }
 
@@ -377,7 +375,9 @@ function Planner(props) {
     setCourses(updatedCourses);
   };
 
-  const planAdvising = () => {
+  const planAdvising = (seed) => {
+    if (Object.keys(courses).length === 0) return
+
     setFinishedPlanning(() => false)
 
     // Resetting previous advising
@@ -393,80 +393,75 @@ function Planner(props) {
 
     for (let c in courses) { // >>> For each course... <<<
       if (courses[c].taken) continue
-      console.log("________course ", c)
 
       for (let i = 0; i < days.length; i++) { // >>> For each day... <<<
-        console.log("_____________day ", days[i])
         if (courses[c].taken) break
 
-        if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
+        let offsetDayIndex = (Math.floor(6 * seed / 100) + i) % 7 // 0 to 6 = 7 days in a week
+        let day = days[offsetDayIndex].toUpperCase()
+
+        if (classesInADay[day.toUpperCase()] >= maxClassesPerDay) {
           continue
         }
 
         // Filtering possible class days
-        if ((days[i].toUpperCase() === 'S' ||
-          days[i].toUpperCase() === 'T') &&
+        if ((day.toUpperCase() === 'S' ||
+          day.toUpperCase() === 'T') &&
           !stPossible) {
           continue
         }
-        else if ((days[i].toUpperCase() === 'M' ||
-          days[i].toUpperCase() === 'W') &&
+        else if ((day.toUpperCase() === 'M' ||
+          day.toUpperCase() === 'W') &&
           !mwPossible) {
           continue
         }
-        else if ((days[i].toUpperCase() === 'R' ||
-          days[i].toUpperCase() === 'A') &&
+        else if ((day.toUpperCase() === 'R' ||
+          day.toUpperCase() === 'A') &&
           !raPossible) {
           continue
         }
-        else if (days[i].toUpperCase() === 'F' &&
+        else if (day.toUpperCase() === 'F' &&
           !fPossible) {
           continue
         }
 
-        let day = days[i].toUpperCase()
-
         let keptLongGap = false
         for (let j = 0; j < timeSlots.length; j++) { // >>> For each time slot... Advise <<<
-          console.log("_____________time ", timeSlots[j])
 
           // If max classes reached then break
-          console.log(classesInADay[days[i].toUpperCase()], maxClassesPerDay)
-          if (classesInADay[days[i].toUpperCase()] >= maxClassesPerDay) {
+          if (classesInADay[day.toUpperCase()] >= maxClassesPerDay) {
             break
           }
 
+          let offsetTimeIndex = (Math.floor((timeSlots.length - 1) * (seed % 33) / 33) + j) % timeSlots.length
+          let timeSlot = timeSlots[offsetTimeIndex]
 
           // Keeping long gap: if half or, more classes are taken already then skip a few slots
-          console.log(keepLongGaps, avoidLongGaps, classesInADay[day], maxClassesPerDay)
           if (!keptLongGap && keepLongGaps && classesInADay[day] === Math.floor(maxClassesPerDay / 2)) {
             j += 2
-            console.log("1____________", classesInADay[day], Math.floor(Object.keys(courses).length / 2))
             keptLongGap = true
             continue
           } else if (!keptLongGap && keepLongGaps && classesInADay[day] === Math.floor(Object.keys(courses).length / 2)) {
             j += 2
-            console.log("2____________", classesInADay[day], Math.floor(Object.keys(courses).length / 2))
             keptLongGap = true
             continue
           }
 
           // Avoid prayer time: 12:15 - 1:30 and after 4:20
-          if (avoidPrayerTimes && timeSlots[j] === 735 || timeSlots[j] >= 990) {
+          if (avoidPrayerTimes && timeSlot === 735 || timeSlot >= 990) {
             continue
           }
 
-          if (!isTimeTaken(day, timeSlots[j]) && !isTimeGap(day, timeSlots[j])) {
-            let courseObj = findSections(dayCombinations, c, timeSlots[j], day)
+          if (!isTimeTaken(day, timeSlot) && !isTimeGap(day, timeSlot)) {
+            let courseObj = findSections(dayCombinations, c, timeSlot, day)
             if (!('course' in courseObj)) {
               continue
             }
             else if ('course' in courseObj) {
-              console.log("updated ", courseObj)
               let timeInMin = timeToMinutes(courseObj.time)
               day = timeInMin.days // Updating day with the found day(s)
               let endTime = timeInMin.endTime
-              if (isTimeTaken(day, timeSlots[j]) || isTimeGap(day, timeSlots[j])) {
+              if (isTimeTaken(day, timeSlot) || isTimeGap(day, timeSlot)) {
                 // Second check with the updated day(s)
                 continue
               }
@@ -476,13 +471,8 @@ function Planner(props) {
               }
               else {
                 // Checking max back to back classes
-                console.log("current course = ", c)
-                console.log("max b to b => ", maxBtoBClasses)
-                let lol = getBtoBClasses(day, timeSlots[j])
-                console.log("b to b lol = = " + lol)
-                if (getBtoBClasses(day, timeSlots[j]) >= maxBtoBClasses) { // + 1 to count the current time
-                  console.log("b to b maxed move to next slot")
-                  // j++
+                let lol = getBtoBClasses(day, timeSlot)
+                if (getBtoBClasses(day, timeSlot) >= maxBtoBClasses) {
                   continue
                 }
 
@@ -494,14 +484,11 @@ function Planner(props) {
                     labCourseName += course + "L" + "/"
                   });
                   labCourseName = labCourseName.substring(0, labCourseName.length - 1)// avoid the last "/"
-
-                  console.log(labCourseName, (labCourseName in courses))
                   if (labCourseName in courses) {
                     let preferredSection = getSectionWithHighestSeats(courseObj.sections)
                     let labTimingString = getCourseTiming(labCourseName, preferredSection.section)
                     let labTiming = timeToMinutes(labTimingString)
 
-                    console.log("Lab  ", preferredSection, labTiming)
                     // If taken before, drop it first
                     updateCourse(labCourseName, false, "Time clashes", [])
                     courses[labCourseName].taken = false
@@ -538,7 +525,6 @@ function Planner(props) {
                         classesInADay[labTiming.days.charAt(1)]++
                         // BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
                       }
-                      console.log("classes => ", day, classesInADay)
 
                       break
                     }
@@ -560,17 +546,11 @@ function Planner(props) {
                   classesInADay[day.charAt(1)]++
                   // BtoBClassesInADay[day.charAt(1)] = getBtoBClasses(day.charAt(1), timeToMinutes(courseObj.time).startTime)
                 }
-                console.log("classes => ", c, day, classesInADay, getBtoBClasses(day.charAt(0), timeToMinutes(courseObj.time).startTime))
-                console.log("avoid prayer time ", avoidPrayerTimes)
 
                 // Checking max back to back classes
-                console.log("current course = ", c)
-                console.log("max b to b => ", maxBtoBClasses)
-                console.log("b to b lol = = " + getBtoBClasses(day, timeSlots[j]))
-                if (getBtoBClasses(day, timeSlots[j]) >= maxBtoBClasses) {
-                  console.log("b to b maxed move to next slot")
-                  continue
-                }
+                // if (getBtoBClasses(day, timeSlot) >= maxBtoBClasses) {
+                //   continue
+                // }
 
                 break
               }
@@ -579,7 +559,6 @@ function Planner(props) {
         }
       }
     }
-    console.log(courses)
     setFinishedPlanning(() => true)
   }
 
@@ -819,7 +798,7 @@ function Planner(props) {
                 </Flex>
               </Card>
             </Flex>
-            <Button onClick={() => planAdvising()} color='green'>Proceed</Button>
+            <Button onClick={() => planAdvising(0)} color='green'>Plan Advising</Button>
           </Flex>
         </Card>
 
@@ -829,12 +808,19 @@ function Planner(props) {
               finishedPlanning ?
                 (
                   <Flex direction="column" gap="3">
+                    <Heading size="5">Advising Plan</Heading>
+                    <Flex justify="center" align="center" gap="3">
+                      <IconButton variant='soft'>
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.49991 0.876892C3.84222 0.876892 0.877075 3.84204 0.877075 7.49972C0.877075 11.1574 3.84222 14.1226 7.49991 14.1226C11.1576 14.1226 14.1227 11.1574 14.1227 7.49972C14.1227 3.84204 11.1576 0.876892 7.49991 0.876892ZM1.82707 7.49972C1.82707 4.36671 4.36689 1.82689 7.49991 1.82689C10.6329 1.82689 13.1727 4.36671 13.1727 7.49972C13.1727 10.6327 10.6329 13.1726 7.49991 13.1726C4.36689 13.1726 1.82707 10.6327 1.82707 7.49972ZM8.24992 4.49999C8.24992 4.9142 7.91413 5.24999 7.49992 5.24999C7.08571 5.24999 6.74992 4.9142 6.74992 4.49999C6.74992 4.08577 7.08571 3.74999 7.49992 3.74999C7.91413 3.74999 8.24992 4.08577 8.24992 4.49999ZM6.00003 5.99999H6.50003H7.50003C7.77618 5.99999 8.00003 6.22384 8.00003 6.49999V9.99999H8.50003H9.00003V11H8.50003H7.50003H6.50003H6.00003V9.99999H6.50003H7.00003V6.99999H6.50003H6.00003V5.99999Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
+                      </IconButton>
+                      <Text>Seed:</Text>
+                      <Slider onValueChange={(value) => planAdvising(value[0])} variant="soft" defaultValue={[0]} />
+                    </Flex>
                     <Button color='blue' onClick={handleCapture}>
-                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 2C7.77614 2 8 2.22386 8 2.5L8 11.2929L11.1464 8.14645C11.3417 7.95118 11.6583 7.95118 11.8536 8.14645C12.0488 8.34171 12.0488 8.65829 11.8536 8.85355L7.85355 12.8536C7.75979 12.9473 7.63261 13 7.5 13C7.36739 13 7.24021 12.9473 7.14645 12.8536L3.14645 8.85355C2.95118 8.65829 2.95118 8.34171 3.14645 8.14645C3.34171 7.95118 3.65829 7.95118 3.85355 8.14645L7 11.2929L7 2.5C7 2.22386 7.22386 2 7.5 2Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 2C7.77614 2 8 2.22386 8 2.5L8 11.2929L11.1464 8.14645C11.3417 7.95118 11.6583 7.95118 11.8536 8.14645C12.0488 8.34171 12.0488 8.65829 11.8536 8.85355L7.85355 12.8536C7.75979 12.9473 7.63261 13 7.5 13C7.36739 13 7.24021 12.9473 7.14645 12.8536L3.14645 8.85355C2.95118 8.65829 2.95118 8.34171 3.14645 8.14645C3.34171 7.95118 3.65829 7.95118 3.85355 8.14645L7 11.2929L7 2.5C7 2.22386 7.22386 2 7.5 2Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                       Save as Image
                     </Button>
                     <Flex ref={captureRef} style={{ backgroundColor: "var(--indigo-3)" }} direction="column" justify="center" align="center" gap="2">
-                      <Heading size="5">Advising Plan 1</Heading>
                       <Table.Root style={{ backgroundColor: "var(--indigo-2)" }} variant="surface">
                         <Table.Header>
                           <Table.Row>
