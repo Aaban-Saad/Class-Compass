@@ -1,6 +1,7 @@
 import { Popover, Heading, Table, Text, Card, Flex, TextField, Button, Badge, Grid, Select, Checkbox, CheckboxCards, IconButton } from '@radix-ui/themes'
 import Navbar from '../../components/Navbar/Navbar'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import domtoimage from 'dom-to-image'
 
 function Planner(props) {
   const [data, setData] = useState(null)
@@ -124,6 +125,22 @@ function Planner(props) {
 
     const sections = findSections(dayCombinations, "CSE225", "480", "S");
     console.log(sections);
+  };
+
+  const captureRef = useRef(null);
+
+  const handleCapture = () => {
+    const element = captureRef.current;
+    domtoimage.toPng(element)
+      .then((dataUrl) => {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'advising-pan.png';
+        link.click();
+      })
+      .catch((error) => {
+        console.error('Error capturing the image:', error);
+      });
   };
 
   const findSections = (schedule, course, begTime, days) => {
@@ -811,10 +828,14 @@ function Planner(props) {
             {
               finishedPlanning ?
                 (
-                  <>
-                    <Flex direction="column" justify="center" align="center" gap="2">
-                      <Heading>Advising Plan</Heading>
-                      <Table.Root variant="surface">
+                  <Flex direction="column" gap="3">
+                    <Button color='blue' onClick={handleCapture}>
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 2C7.77614 2 8 2.22386 8 2.5L8 11.2929L11.1464 8.14645C11.3417 7.95118 11.6583 7.95118 11.8536 8.14645C12.0488 8.34171 12.0488 8.65829 11.8536 8.85355L7.85355 12.8536C7.75979 12.9473 7.63261 13 7.5 13C7.36739 13 7.24021 12.9473 7.14645 12.8536L3.14645 8.85355C2.95118 8.65829 2.95118 8.34171 3.14645 8.14645C3.34171 7.95118 3.65829 7.95118 3.85355 8.14645L7 11.2929L7 2.5C7 2.22386 7.22386 2 7.5 2Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                      Save as Image
+                    </Button>
+                    <Flex ref={captureRef} style={{ backgroundColor: "var(--indigo-3)" }} direction="column" justify="center" align="center" gap="2">
+                      <Heading size="5">Advising Plan 1</Heading>
+                      <Table.Root style={{ backgroundColor: "var(--indigo-2)" }} variant="surface">
                         <Table.Header>
                           <Table.Row>
                             <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
@@ -854,7 +875,7 @@ function Planner(props) {
                         </Table.Body>
                       </Table.Root>
                     </Flex>
-                  </>
+                  </Flex>
 
                 ) : true
             }
